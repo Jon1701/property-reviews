@@ -10,6 +10,8 @@ Full Stack Application which allows users to review residential properties.
 
 ## Requirements
 
+- [Go v1.18](https://go.dev/)
+
 ## Commands
 
 The following `make` commands are available:

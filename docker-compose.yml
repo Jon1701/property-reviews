@@ -9,3 +9,5 @@ services:
       POSTGRES_USER: ${POSTGRES_ADMIN_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./.docker/.volumes/postgres/:/var/lib/postgresql

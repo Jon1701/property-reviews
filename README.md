@@ -33,3 +33,4 @@ The following `make` commands are available:
 - `make psql` to open `psql` in the Postgres container
 - `make run` to run the Go application
 - `make initialize-db` to initialize the database (create users, tables, etc)
+- `make wait-5s` to halt execution for 5 seconds

@@ -40,6 +40,12 @@ run:
 		go run main.go
 	@echo "Done running main.go"
 
+# Wait 5 seconds.
+wait-5s:
+	@echo "Waiting for 5 seconds..."
+	@sleep 5s
+	@echo "Done waiting for 5 seconds"
+
 # Run the database initialization script.
 initialize-db:
 	@echo "Initializing database..."

@@ -11,3 +11,5 @@ Full Stack Application which allows users to review residential properties.
 ## Commands
 
 The following `make` commands are available:
+
+- `make run` to run the Go application

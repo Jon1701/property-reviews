@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Jon1701/property-reviews/app/routes"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default();
-
-	r.GET("", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
-	})
+	
+	routes.RegisterRoutes(r)
 
 	serverPort := os.Getenv("SERVER_PORT")
 

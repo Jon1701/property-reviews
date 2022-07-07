@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,9 @@ func main() {
 		})
 	})
 
-	err := r.Run(":3000")
+	serverPort := os.Getenv("SERVER_PORT")
+
+	err := r.Run(fmt.Sprintf(":%s", serverPort))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start the web server - Error %v", err))
 	}

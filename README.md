@@ -15,6 +15,10 @@ Full Stack Application which allows users to review residential properties.
 
 ## Environment Variables
 
+| Variable      | Description         |
+| ------------- | ------------------- |
+| `SERVER_PORT` | Backend server port |
+
 ## Commands
 
 The following `make` commands are available:

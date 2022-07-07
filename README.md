@@ -13,6 +13,8 @@ Full Stack Application which allows users to review residential properties.
 - [Go v1.18](https://go.dev/)
 - [GNU Make](https://www.gnu.org/software/make/)
 
+## Environment Variables
+
 ## Commands
 
 The following `make` commands are available:

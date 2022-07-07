@@ -15,13 +15,14 @@ Full Stack Application which allows users to review residential properties.
 
 ## Environment Variables
 
-| Variable                         | Description                                      |
-| -------------------------------- | ------------------------------------------------ |
-| `SERVER_PORT`                    | Backend server port                              |
-| `POSTGRES_DOCKER_CONTAINER_NAME` | Container name for the Postgres Database service |
-| `POSTGRES_ADMIN_USERNAME`        | Username for the Postgres administrator account  |
-| `POSTGRES_ADMIN_PASSWORD`        | Password for the Postgres administrator account  |
-| `POSTGRES_DB`                    | Default Postgres database                        |
+| Variable                         | Description                                                    |
+| -------------------------------- | -------------------------------------------------------------- |
+| `SERVER_PORT`                    | Backend server port                                            |
+| `POSTGRES_DOCKER_CONTAINER_NAME` | Container name for the Postgres Database service               |
+| `POSTGRES_ADMIN_USERNAME`        | Username for the Postgres administrator account                |
+| `POSTGRES_ADMIN_PASSWORD`        | Password for the Postgres administrator account                |
+| `POSTGRES_DB`                    | Default Postgres database                                      |
+| `POSTGRES_ADMIN_CONNSTRING`      | Postgres connection string for using the administrator account |
 
 ## Commands
 

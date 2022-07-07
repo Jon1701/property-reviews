@@ -33,7 +33,7 @@ db-shell:
 # Executes psql in container.
 psql:
 	@echo "Executing psql..."
-	@docker exec -it ${POSTGRES_DOCKER_CONTAINER_NAME} bash -c "psql postgresql://${POSTGRES_ADMIN_PASSWORD}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}"
+	@docker exec -it ${POSTGRES_DOCKER_CONTAINER_NAME} bash -c "psql ${POSTGRES_ADMIN_CONNSTRING}"
 	@echo "Done executing psql"
 
 # Executes main.go.

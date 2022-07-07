@@ -27,10 +27,11 @@ Full Stack Application which allows users to review residential properties.
 
 The following `make` commands are available:
 
-- `make start-services` to start Docker services
-- `make stop-services` to stop Docker services
+- `make start` to start Docker services and initialize the database
+  - `make start-services` to start Docker services
+  - `make stop-services` to stop Docker services
+  - `make initialize-db` to initialize the database (create users, tables, etc)
 - `make db-shell` to open a `bash` shell in the Postgres container
 - `make psql` to open `psql` in the Postgres container
 - `make run` to run the Go application
-- `make initialize-db` to initialize the database (create users, tables, etc)
 - `make wait-5s` to halt execution for 5 seconds

@@ -8,6 +8,8 @@ Active
 
 Full Stack Application which allows users to review residential properties.
 
+## Requirements
+
 ## Commands
 
 The following `make` commands are available:

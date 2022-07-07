@@ -3,6 +3,7 @@ POSTGRES_DOCKER_CONTAINER_NAME=postgres
 POSTGRES_ADMIN_USERNAME=postgres
 POSTGRES_ADMIN_PASSWORD=postgres
 POSTGRES_DB=property-reviews
+POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_PASSWORD}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
 
 # Starts Docker Compose services.
 start-services:
@@ -38,3 +39,13 @@ run:
 	@SERVER_PORT=${SERVER_PORT} \
 		go run main.go
 	@echo "Done running main.go"
+
+# Run the database initialization script.
+initialize-db:
+	@echo "Initializing database..."
+	@docker container cp ./.db/initialize-db.sql ${POSTGRES_DOCKER_CONTAINER_NAME}:/tmp
+	@docker container exec \
+		-t ${POSTGRES_DOCKER_CONTAINER_NAME} \
+			psql ${POSTGRES_ADMIN_CONNSTRING} \
+				-f /tmp/initialize-db.sql
+	@echo "Done initialization database"

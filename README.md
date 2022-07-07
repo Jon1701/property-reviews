@@ -32,3 +32,4 @@ The following `make` commands are available:
 - `make db-shell` to open a `bash` shell in the Postgres container
 - `make psql` to open `psql` in the Postgres container
 - `make run` to run the Go application
+- `make initialize-db` to initialize the database (create users, tables, etc)

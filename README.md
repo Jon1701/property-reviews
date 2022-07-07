@@ -11,6 +11,7 @@ Full Stack Application which allows users to review residential properties.
 ## Requirements
 
 - [Go v1.18](https://go.dev/)
+- [GNU Make](https://www.gnu.org/software/make/)
 
 ## Commands
 

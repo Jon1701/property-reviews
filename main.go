@@ -10,9 +10,14 @@ import (
 
 func main() {
 	r := gin.Default();
-	
+
 	routes.RegisterRoutes(r)
 
+	api := r.Group("/api")
+
+	users := api.Group("/users")
+	routes.RegisterUserRoutes(users)
+	
 	serverPort := os.Getenv("SERVER_PORT")
 
 	err := r.Run(fmt.Sprintf(":%s", serverPort))

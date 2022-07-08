@@ -5,6 +5,10 @@ POSTGRES_ADMIN_PASSWORD=postgres
 POSTGRES_DB=property-reviews
 POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
 
+POSTGRES_APP_USERNAME=appuser
+POSTGRES_APP_PASSWORD=appuser
+POSTGRES_APP_CONNSTRING=postgresql://${POSTGRES_APP_USERNAME}:${POSTGRES_APP_PASSWORD}@localhost/${POSTGRES_DB}
+
 # Starts services and initializes the database.
 start: stop-services start-services wait-5s initialize-db
 
@@ -40,7 +44,8 @@ psql:
 # Executes main.go.
 run:
 	@echo "Running main.go"
-	@SERVER_PORT=${SERVER_PORT} \
+	SERVER_PORT=${SERVER_PORT} \
+	POSTGRES_CONNSTRING=${POSTGRES_APP_CONNSTRING} \
 		go run main.go
 	@echo "Done running main.go"
 

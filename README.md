@@ -23,6 +23,9 @@ Full Stack Application which allows users to review residential properties.
 | `POSTGRES_ADMIN_PASSWORD`        | Password for the Postgres administrator account                |
 | `POSTGRES_DB`                    | Default Postgres database                                      |
 | `POSTGRES_ADMIN_CONNSTRING`      | Postgres connection string for using the administrator account |
+| `POSTGRES_APP_USERNAME`          | Username for the Postgres application account                  |
+| `POSTGRES_APP_PASSWORD`          | Password for the Postgres application account                  |
+| `POSTGRES_APP_CONNSTRING`        | Postgres connection string for using the application account   |
 
 ## Commands
 

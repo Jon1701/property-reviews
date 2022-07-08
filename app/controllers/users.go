@@ -2,12 +2,26 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/Jon1701/property-reviews/app/errors"
 	"github.com/Jon1701/property-reviews/app/validation"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
+
+// Generates a hashed and salted password.
+func hashAndSalt(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to generate hash from password - Error %v", err))
+	}
+
+	return string(hash)
+}
+
+
 
 // Creates a User.
 func CreateUser(c *gin.Context) {
@@ -41,7 +55,7 @@ func CreateUser(c *gin.Context) {
 		c.Data(400, "application/json", []byte(body))
 		return;
 	}
-	
+
 	c.JSON(200, gin.H{
 		"message": "Create User controller says hello world",
 	})

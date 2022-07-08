@@ -3,7 +3,7 @@ POSTGRES_DOCKER_CONTAINER_NAME=postgres
 POSTGRES_ADMIN_USERNAME=postgres
 POSTGRES_ADMIN_PASSWORD=postgres
 POSTGRES_DB=property-reviews
-POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_PASSWORD}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
+POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
 
 # Starts services and initializes the database.
 start: stop-services start-services wait-5s initialize-db

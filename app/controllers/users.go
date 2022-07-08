@@ -21,7 +21,15 @@ func hashAndSalt(password string) string {
 	return string(hash)
 }
 
+// Compares a hashed password and plaintext password.
+func compareHashAndPassword(hashedPassword string, plainPassword string) bool {
+	byteHash := []byte(hashedPassword)
+	bytePassword := []byte(plainPassword)
 
+	err := bcrypt.CompareHashAndPassword(byteHash, bytePassword)
+	
+	return err == nil
+}
 
 // Creates a User.
 func CreateUser(c *gin.Context) {

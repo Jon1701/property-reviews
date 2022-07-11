@@ -45,7 +45,7 @@ psql:
 run:
 	@echo "Running main.go"
 	SERVER_PORT=${SERVER_PORT} \
-	POSTGRES_CONNSTRING=${POSTGRES_APP_CONNSTRING} \
+	POSTGRES_APP_CONNSTRING=${POSTGRES_APP_CONNSTRING} \
 		go run main.go
 	@echo "Done running main.go"
 

@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	db, err := storage.NewConnection()
+	dbConnString := os.Getenv("POSTGRES_APP_CONNSTRING")
+	db, err := storage.NewConnection(dbConnString)
 	if err != nil {
 		log.Fatal("Failed to connect to the database", err)
 	}

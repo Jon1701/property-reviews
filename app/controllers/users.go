@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 
 	"github.com/Jon1701/property-reviews/app/errors"
+	"github.com/Jon1701/property-reviews/app/serializers"
 	"github.com/Jon1701/property-reviews/app/validation"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -27,17 +28,17 @@ func compareHashAndPassword(hashedPassword string, plainPassword string) bool {
 	bytePassword := []byte(plainPassword)
 
 	err := bcrypt.CompareHashAndPassword(byteHash, bytePassword)
-	
+
 	return err == nil
 }
 
 // Creates a User.
 func CreateUser(c *gin.Context) {
-	user := validation.User{}
+	user := serializers.User{}
 
-	data, err := ioutil.ReadAll(c.Request.Body);
+	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		msg := errors.FailedToParseRequestBody;
+		msg := errors.FailedToParseRequestBody
 		c.JSON(400, gin.H{
 			"message": &msg,
 		})
@@ -46,7 +47,7 @@ func CreateUser(c *gin.Context) {
 
 	err = json.Unmarshal(data, &user)
 	if err != nil {
-		msg := errors.FailedToParseRequestBody;
+		msg := errors.FailedToParseRequestBody
 		c.JSON(400, gin.H{
 			"message": &msg,
 		})
@@ -61,10 +62,10 @@ func CreateUser(c *gin.Context) {
 		}
 
 		c.Data(400, "application/json", []byte(body))
-		return;
+		return
 	}
 
 	c.JSON(200, gin.H{
 		"message": "Create User controller says hello world",
 	})
-}	
+}

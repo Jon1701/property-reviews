@@ -4,25 +4,19 @@ import (
 	"regexp"
 
 	"github.com/Jon1701/property-reviews/app/errors"
+	"github.com/Jon1701/property-reviews/app/serializers"
 )
 
-type User struct {
-	ID *string `json:"id,omitempty"`
-	Username *string `json:"username,omitempty"`
-	Password *string `json:"password,omitempty"`
-	EmailAddress *string `json:"emailAddress,omitempty"`
-}
-
 type UserValidationResults struct {
-	Username *errors.ErrorMessage `json:"username,omitempty"`
-	Password *errors.ErrorMessage `json:"password,omitempty"`
+	Username     *errors.ErrorMessage `json:"username,omitempty"`
+	Password     *errors.ErrorMessage `json:"password,omitempty"`
 	EmailAddress *errors.ErrorMessage `json:"emailAddress,omitempty"`
 }
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 // Performs field validation for the Create User route.
-func ValidateCreateUser(user User) (*UserValidationResults) {
+func ValidateCreateUser(user serializers.User) *UserValidationResults {
 	results := UserValidationResults{}
 	passValidation := true
 

@@ -1,10 +1,10 @@
 package errors
 
 const (
-	UsernameMinLength int = 1
-	UsernameMaxLength int = 50
-	PasswordMinLength int = 8
-	PasswordMaxLength int = 1000
+	UsernameMinLength     int = 1
+	UsernameMaxLength     int = 50
+	PasswordMinLength     int = 8
+	PasswordMaxLength     int = 1000
 	EmailAddressMinLength int = 5
 	EmailAddressMaxLength int = 255
 )

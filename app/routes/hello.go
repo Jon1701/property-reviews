@@ -5,6 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var RegisterRoutes = func (r *gin.Engine) {
+var RegisterRoutes = func(r *gin.Engine) {
 	r.GET("/", controllers.RootHandlerFunc)
 }

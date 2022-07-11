@@ -20,7 +20,6 @@ func main() {
 	appCtx := controllers.New(db)
 
 	r := gin.Default()
-	routes.RegisterRoutes(r)
 
 	api := r.Group("/api")
 	users := api.Group("/users")

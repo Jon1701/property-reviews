@@ -7,7 +7,7 @@ import (
 	"github.com/Jon1701/property-reviews/app/serializers"
 )
 
-type UserValidationResults struct {
+type User struct {
 	Username     *errors.ErrorMessage `json:"username,omitempty"`
 	Password     *errors.ErrorMessage `json:"password,omitempty"`
 	EmailAddress *errors.ErrorMessage `json:"emailAddress,omitempty"`
@@ -16,8 +16,8 @@ type UserValidationResults struct {
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 // Performs field validation for the Create User route.
-func ValidateCreateUser(user serializers.User) *UserValidationResults {
-	results := UserValidationResults{}
+func ValidateCreateUser(user serializers.User) *User {
+	results := User{}
 	passValidation := true
 
 	if user.Username == nil {

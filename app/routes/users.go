@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterUserRoutes(rg *gin.RouterGroup) {
-	rg.POST("/signup", controllers.CreateUser)
+// Registers the routes under the /api/users group.
+func RegisterUserRoutes(appCtx *controllers.AppContext, rg *gin.RouterGroup) {
+	rg.POST("/signup", appCtx.CreateUser)
 }

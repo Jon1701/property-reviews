@@ -33,7 +33,7 @@ func compareHashAndPassword(hashedPassword string, plainPassword string) bool {
 }
 
 // Creates a User.
-func CreateUser(c *gin.Context) {
+func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	user := serializers.User{}
 
 	data, err := ioutil.ReadAll(c.Request.Body)

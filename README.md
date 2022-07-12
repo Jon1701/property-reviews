@@ -33,6 +33,7 @@ The following `make` commands are available:
   - `make start-services` to start Docker services
   - `make stop-services` to stop Docker services
   - `make initialize-db` to initialize the database (create users, tables, etc)
+- `make destroy` to stop Docker services and deletes volumes
 - `make db-shell` to open a `bash` shell in the Postgres container
 - `make psql` to open `psql` in the Postgres container
 - `make run` to run the Go application

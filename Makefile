@@ -26,6 +26,12 @@ stop-services:
 	@docker-compose down
 	@echo "Done stopping services"
 
+# Stops all Docker Compose services and deletes all volumes.
+destroy:
+	@echo "Stopping services and deleting volumes..."
+	@docker-compose down --volumes
+	@echo "Done stopping services and deleting volumes"
+
 # Opens a shell to the Postgres Docker container.
 db-shell:
 	@echo "Opening a shell to \`${POSTGRES_DOCKER_CONTAINER_NAME}\` Docker container..."

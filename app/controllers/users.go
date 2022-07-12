@@ -80,8 +80,9 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	}
 
 	// Check if Email Address is already registered.
+	lowercaseEmail := strings.ToLower(*user.EmailAddress)
 	m := models.User{}
-	appCtx.DB.Where("email_address = ?", user.EmailAddress).First(&m)
+	appCtx.DB.Where("email_address = ?", lowercaseEmail).First(&m)
 	if m.IDHash != nil {
 		msg := errormessages.EmailAddressAlreadyRegistered
 
@@ -104,7 +105,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	// Persist into database.
 	m = models.User{
 		IDHash:       &idHash,
-		EmailAddress: user.EmailAddress,
+		EmailAddress: &lowercaseEmail,
 		Password:     &pw,
 	}
 	result := appCtx.DB.Create(&m)
@@ -153,8 +154,9 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	}
 
 	// Check if Email Address is registered.
-	m := models.User{EmailAddress: user.EmailAddress}
-	result := appCtx.DB.Where("email_address = ?", user.EmailAddress).First(&m)
+	lowercaseEmail := strings.ToLower(*user.EmailAddress)
+	m := models.User{}
+	result := appCtx.DB.Where("email_address = ?", lowercaseEmail).First(&m)
 	if result.Error != nil {
 		body, err := json.Marshal(validation.User{
 			EmailAddress: &errormessages.EmailAddressOrPasswordIsIncorrect,
@@ -186,7 +188,8 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	}
 
 	// Generate JWT.
-	p := auth.Payload{EmailAddress: *m.EmailAddress, UserID: *m.IDHash}
+	lowercaseEmail = strings.ToLower(*m.EmailAddress)
+	p := auth.Payload{EmailAddress: lowercaseEmail, UserID: *m.IDHash}
 	token, err := auth.GenerateJWT(p)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to generate JWT: %+v\n", err))

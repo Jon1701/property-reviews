@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 	email_address	VARCHAR(255)
 								NOT NULL
+								CHECK (email_address = lower(email_address))
 								UNIQUE,
 
 	password			TEXT

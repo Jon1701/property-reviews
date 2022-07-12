@@ -9,7 +9,8 @@ const (
 	EmailAddressMaxLength int = 255
 )
 
-var UsernameInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(UsernameMinLength, UsernameMaxLength)
-var PasswordInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(PasswordMinLength, PasswordMaxLength)
-var EmailAddressRequired ErrorMessage = "a valid email address is required"
+var EmailAddressAlreadyRegistered ErrorMessage = "email address is already registered"
 var EmailAddressInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(EmailAddressMinLength, EmailAddressMaxLength)
+var EmailAddressRequired ErrorMessage = "a valid email address is required"
+var PasswordInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(PasswordMinLength, PasswordMaxLength)
+var UsernameInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(UsernameMinLength, UsernameMaxLength)

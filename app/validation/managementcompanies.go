@@ -65,3 +65,47 @@ func ValidateCreateManagementCompany(company serializers.ManagementCompany) *Man
 
 	return &results
 }
+
+// Performs field validation for Management Company struct values under the
+// Update Management Company route.
+func ValidateUpdateManagementCompany(company serializers.ManagementCompany) *ManagementCompany {
+	results := ManagementCompany{}
+	passValidation := true
+
+	// Check Company Name length.
+	if company.Name != nil {
+		isValidLength := len(*company.Name) >= errormessages.ManagementCompanyNameMinLength && len(*company.Name) <= errormessages.ManagementCompanyNameMaxLength
+		if !isValidLength {
+			results.Name = &errormessages.ManagementCompanyNameInvalidFieldLength
+			passValidation = false
+		}
+	}
+
+	// Check Address length.
+	if company.Address != nil {
+		resultsAddress := ValidateAddressIgnoreNil(company.Address)
+		if resultsAddress != nil {
+			results.Address = resultsAddress
+			passValidation = false
+		}
+	}
+
+	// Check Website URL validity and length.
+	if company.Website != nil {
+		if !IsValidURL(*company.Website) {
+			results.Website = &errormessages.InvalidURL
+			passValidation = false
+		}
+
+		if !IsURLOfCorrectLength(*company.Website) {
+			results.Website = &errormessages.WebsiteInvalidLength
+			passValidation = false
+		}
+	}
+
+	if passValidation {
+		return nil
+	}
+
+	return &results
+}

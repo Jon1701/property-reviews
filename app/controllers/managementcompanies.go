@@ -3,11 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
-	"github.com/Jon1701/property-reviews/app/errormessages"
 	"github.com/Jon1701/property-reviews/app/models"
 	"github.com/Jon1701/property-reviews/app/serializers"
 	"github.com/Jon1701/property-reviews/app/validation"
@@ -26,25 +24,8 @@ func generateManagementIDHash() string {
 func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	company := serializers.ManagementCompany{}
 
-	// Read request body.
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
-
-	// Parse request body.
-	err = json.Unmarshal(data, &company)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
+	// Serialize the request body, respond with Bad Request if unable to.
+	SerializeRequestBodyAndRespondIfErrored(c, &company)
 
 	// Field validation.
 	results := validation.ValidateCreateManagementCompany(company)
@@ -97,25 +78,8 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 		return
 	}
 
-	// Read request body.
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
-
-	// Parse request body.
-	err = json.Unmarshal(data, &company)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
+	// Serialize the request body, respond with Bad Request if unable to.
+	SerializeRequestBodyAndRespondIfErrored(c, &company)
 
 	// Field validation.
 	results := validation.ValidateUpdateManagementCompany(company)
@@ -142,14 +106,14 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	m.Website = company.Website
 	result = appCtx.DB.Updates(&m)
 	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to persist Management Company in database: %+v\n", err))
+		panic(fmt.Sprintf("Failed to persist Management Company in database: %+v\n", result.Error))
 	}
 
 	// Get updated row.
 	m = models.ManagementCompany{}
 	result = appCtx.DB.Where("id_hash = ?", managementID).First(&m)
 	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to get Management Company from database: %+v\n", err))
+		panic(fmt.Sprintf("Failed to get Management Company from database: %+v\n", result.Error))
 	}
 
 	// Serialize row into JSON.

@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -48,25 +47,8 @@ func compareHashAndPassword(hashedPassword string, plainPassword string) bool {
 func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	user := serializers.User{}
 
-	// Read request body.
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
-
-	// Parse request body.
-	err = json.Unmarshal(data, &user)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
+	// Serialize the request body, respond with Bad Request if unable to.
+	SerializeRequestBodyAndRespondIfErrored(c, &user)
 
 	// Validation request body object.
 	results := validation.ValidateCreateUser(user)
@@ -122,25 +104,8 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	user := serializers.User{}
 
-	// Read request body.
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
-
-	// Parse request body.
-	err = json.Unmarshal(data, &user)
-	if err != nil {
-		msg := errormessages.FailedToParseRequestBody
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": &msg,
-		})
-		return
-	}
+	// Serialize the request body, respond with Bad Request if unable to.
+	SerializeRequestBodyAndRespondIfErrored(c, &user)
 
 	// Validation request body object.
 	results := validation.ValidateUserLogin(user)

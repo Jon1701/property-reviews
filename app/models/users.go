@@ -6,9 +6,6 @@ type User struct {
 	// UUID for this User.
 	IDHash *string `gorm:"column:id_hash"`
 
-	// Username.
-	Username *string `gorm:"column:username"`
-
 	// Email Address.
 	EmailAddress *string `gorm:"column:email_address"`
 

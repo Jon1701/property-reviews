@@ -20,20 +20,6 @@ func ValidateCreateUser(user serializers.User) *User {
 	results := User{}
 	passValidation := true
 
-	if user.Username == nil {
-		// No username.
-		msg := errors.UsernameInvalidFieldLength
-		results.Username = &msg
-		passValidation = false
-	} else {
-		// Length check.
-		if len(*user.Username) < errors.UsernameMinLength || len(*user.Username) > errors.UsernameMaxLength {
-			msg := errors.UsernameInvalidFieldLength
-			results.Username = &msg
-			passValidation = false
-		}
-	}
-
 	if user.Password == nil {
 		// No password.
 		msg := errors.PasswordInvalidFieldLength

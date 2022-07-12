@@ -104,7 +104,6 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	// Persist into database.
 	m = models.User{
 		IDHash:       &idHash,
-		Username:     user.Username,
 		EmailAddress: user.EmailAddress,
 		Password:     &pw,
 	}

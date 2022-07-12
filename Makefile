@@ -7,7 +7,7 @@ POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADM
 
 POSTGRES_APP_USERNAME=appuser
 POSTGRES_APP_PASSWORD=appuser
-POSTGRES_APP_CONNSTRING=postgresql://${POSTGRES_APP_USERNAME}:${POSTGRES_APP_PASSWORD}@localhost/${POSTGRES_DB}
+POSTGRES_APP_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
 
 # Starts services and initializes the database.
 start: stop-services start-services wait-5s initialize-db

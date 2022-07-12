@@ -8,4 +8,5 @@ import (
 // Registers the routes under the /api/management group.
 func RegisterManagementCompaniesRoutes(appCtx *controllers.AppContext, rg *gin.RouterGroup) {
 	rg.POST("/", appCtx.CreateManagementCompany)
+	rg.PATCH("/:managementID", appCtx.UpdateManagementCompany)
 }

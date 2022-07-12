@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	"github.com/Jon1701/property-reviews/app/errormessages"
@@ -88,7 +87,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 		v := validation.User{EmailAddress: &msg}
 		body, err := json.Marshal(v)
 		if err != nil {
-			panic(error.Error(err))
+			panic(fmt.Sprintf("Failed to Marshal the User Validation struct: %v\n", err))
 		}
 
 		c.Data(400, "application/json", []byte(body))
@@ -109,8 +108,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	}
 	result := appCtx.DB.Create(&m)
 	if result.Error != nil {
-		log.Fatal("Failed to create User", result.Error)
-		return
+		panic(fmt.Sprintf("Failed to persist User in the database: %v\n", result.Error))
 	}
 
 	c.Header("Location", fmt.Sprintf("/api/users/%s", *m.IDHash))

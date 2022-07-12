@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/Jon1701/property-reviews/app/controllers"
@@ -15,7 +14,7 @@ func main() {
 	dbConnString := os.Getenv("POSTGRES_APP_CONNSTRING")
 	db, err := storage.NewConnection(dbConnString)
 	if err != nil {
-		log.Fatal("Failed to connect to the database", err)
+		panic(fmt.Sprintf("Failed to connect to the database: %v\n", err))
 	}
 
 	appCtx := controllers.New(db)
@@ -30,6 +29,6 @@ func main() {
 
 	err = r.Run(fmt.Sprintf(":%s", serverPort))
 	if err != nil {
-		panic(fmt.Sprintf("Failed to start the web server - Error %v", err))
+		panic(fmt.Sprintf("Failed to start the web server: %v\n", err))
 	}
 }

@@ -11,28 +11,44 @@ import (
 )
 
 func main() {
+	// Check for Postgres Application Connection string.
 	dbConnString := os.Getenv("POSTGRES_APP_CONNSTRING")
-	db, err := storage.NewConnection(dbConnString)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to connect to the database: %v\n", err))
+	if len(dbConnString) == 0 {
+		panic("Missing Environment Variable: POSTGRES_APP_CONNSTRING")
 	}
 
-	// Exit if JWT signing key not provided.
+	// Check for JWT Signing Key.
 	jwtSigningKey := os.Getenv("JWT_SIGNING_KEY")
 	if len(jwtSigningKey) == 0 {
 		panic("Missing Environment Variable: JWT_SIGNING_KEY")
 	}
 
+	// Check for Server Port.
+	serverPort := os.Getenv("SERVER_PORT")
+	if len(serverPort) == 0 {
+		panic("Missing Environment Variable: SERVER_PORT")
+	}
+
+	// Create database connection.
+	db, err := storage.NewConnection(dbConnString)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to connect to the database: %v\n", err))
+	}
+
+	// Define application context.
 	appCtx := controllers.New(db)
 
+	// Router.
 	r := gin.Default()
 
+	// Subrouters.
 	api := r.Group("/api")
 	users := api.Group("/users")
+
+	// Register /api/users/*.
 	routes.RegisterUserRoutes(&appCtx, users)
 
-	serverPort := os.Getenv("SERVER_PORT")
-
+	// Run server.
 	err = r.Run(fmt.Sprintf(":%s", serverPort))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start the web server: %v\n", err))

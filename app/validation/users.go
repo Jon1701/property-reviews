@@ -61,3 +61,31 @@ func ValidateCreateUser(user serializers.User) *User {
 
 	return &results
 }
+
+// Performs field validation for the User Login route.
+func ValidateUserLogin(user serializers.User) *User {
+	results := User{}
+	passValidation := true
+
+	// Check if Password is provided.
+	if user.Password == nil || (user.Password != nil && len(*user.Password) == 0) {
+		// No password.
+		msg := errormessages.FieldValueRequired
+		results.Password = &msg
+		passValidation = false
+	}
+
+	// Check if Email Address is provided.
+	if user.EmailAddress == nil || (user.EmailAddress != nil && len(*user.EmailAddress) == 0) {
+		// No email address.
+		msg := errormessages.FieldValueRequired
+		results.EmailAddress = &msg
+		passValidation = false
+	}
+
+	if passValidation {
+		return nil
+	}
+
+	return &results
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/Jon1701/property-reviews/app/errormessages"
@@ -51,7 +52,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -61,7 +62,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	err = json.Unmarshal(data, &user)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -75,7 +76,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 			panic(error.Error(err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -92,7 +93,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to Marshal the User Validation struct: %v\n", err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -114,7 +115,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	}
 
 	c.Header("Location", fmt.Sprintf("/api/users/%s", *m.IDHash))
-	c.JSON(204, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // Logs in a User.
@@ -125,7 +126,7 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -135,7 +136,7 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	err = json.Unmarshal(data, &user)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -149,7 +150,7 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 			panic(error.Error(err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -167,7 +168,7 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to Marshal User Login validation struct (Email not found): %+v\n", err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -183,7 +184,7 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to Marshal User Login validation struct (Password mismatch): %+v\n", err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -195,5 +196,5 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 		panic(fmt.Sprintf("Failed to generate JWT: %+v\n", err))
 	}
 
-	c.Data(200, "application/json", []byte(*token))
+	c.Data(http.StatusOK, "application/json", []byte(*token))
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/Jon1701/property-reviews/app/errormessages"
@@ -29,7 +30,7 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -39,7 +40,7 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	err = json.Unmarshal(data, &company)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -53,7 +54,7 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -80,7 +81,7 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	}
 
 	c.Header("Location", fmt.Sprintf("/api/management/%s", *m.IDHash))
-	c.JSON(204, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // Updates a Management Company.
@@ -92,7 +93,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	m := models.ManagementCompany{IDHash: &managementID}
 	result := appCtx.DB.Where("id_hash = ?", managementID).First(&m)
 	if result.Error != nil {
-		c.JSON(404, &gin.H{"message": "Management Company not found"})
+		c.JSON(http.StatusNotFound, &gin.H{"message": "Management Company not found"})
 		return
 	}
 
@@ -100,7 +101,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -110,7 +111,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	err = json.Unmarshal(data, &company)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": &msg,
 		})
 		return
@@ -124,7 +125,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
 		}
 
-		c.Data(400, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", []byte(body))
 		return
 	}
 
@@ -170,5 +171,5 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
 	}
 
-	c.Data(200, "application/json", body)
+	c.Data(http.StatusOK, "application/json", body)
 }

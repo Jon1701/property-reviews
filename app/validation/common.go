@@ -131,3 +131,68 @@ func ValidateAddress(address *serializers.Address, line2Required bool) *Address 
 
 	return &results
 }
+
+// Validates Address struct values, but ignore nil values.
+func ValidateAddressIgnoreNil(address *serializers.Address) *Address {
+	results := Address{}
+	passValidation := true
+
+	// Check Line 1 length.
+	if address.Line1 != nil {
+		isValidLength := len(*address.Line1) >= errormessages.AddressLine1MinLength && len(*address.Line1) <= errormessages.AddressLine1MaxLength
+		if !isValidLength {
+			results.Line1 = &errormessages.AddressLine1InvalidLength
+			passValidation = false
+		}
+	}
+
+	// Check Line 2 length.
+	if address.Line2 != nil {
+		isValidLength := len(*address.Line2) >= errormessages.AddressLine2MinLength && len(*address.Line2) <= errormessages.AddressLine2MaxLength
+		if !isValidLength {
+			results.Line2 = &errormessages.AddressLine2InvalidLength
+		}
+	}
+
+	// Check City length.
+	if address.City != nil {
+		isValidLength := len(*address.City) >= errormessages.AddressCityMinLength && len(*address.City) <= errormessages.AddressCityMaxLength
+		if !isValidLength {
+			results.City = &errormessages.AddressCityInvalidLength
+			passValidation = false
+		}
+	}
+
+	// Check State length.
+	if address.State != nil {
+		isValidLength := len(*address.State) >= errormessages.AddressStateMinLength && len(*address.State) <= errormessages.AddressStateMaxLength
+		if !isValidLength {
+			results.State = &errormessages.AddressStateInvalidLength
+			passValidation = false
+		}
+	}
+
+	// Check Postal Code length.
+	if address.PostalCode != nil {
+		isValidLength := len(*address.PostalCode) >= errormessages.AddressPostalCodeMinLength && len(*address.PostalCode) <= errormessages.AddressPostalCodeMaxLength
+		if !isValidLength {
+			results.PostalCode = &errormessages.AddressPostalCodeInvalidLength
+			passValidation = false
+		}
+	}
+
+	// Check Country length.
+	if address.Country != nil {
+		isValidLength := len(*address.Country) >= errormessages.AddressCountryMinLength && len(*address.Country) <= errormessages.AddressCountryMaxLength
+		if !isValidLength {
+			results.Country = &errormessages.AddressCountryInvalidLength
+			passValidation = false
+		}
+	}
+
+	if passValidation {
+		return nil
+	}
+
+	return &results
+}

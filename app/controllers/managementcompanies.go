@@ -82,3 +82,93 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	c.Header("Location", fmt.Sprintf("/api/management/%s", *m.IDHash))
 	c.JSON(204, nil)
 }
+
+// Updates a Management Company.
+func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
+	company := serializers.ManagementCompany{}
+
+	// Check if Management Company exists.
+	managementID := c.Param("managementID")
+	m := models.ManagementCompany{IDHash: &managementID}
+	result := appCtx.DB.Where("id_hash = ?", managementID).First(&m)
+	if result.Error != nil {
+		c.JSON(404, &gin.H{"message": "Management Company not found"})
+		return
+	}
+
+	// Read request body.
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(400, gin.H{
+			"message": &msg,
+		})
+		return
+	}
+
+	// Parse request body.
+	err = json.Unmarshal(data, &company)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(400, gin.H{
+			"message": &msg,
+		})
+		return
+	}
+
+	// Field validation.
+	results := validation.ValidateUpdateManagementCompany(company)
+	if results != nil {
+		body, err := json.Marshal(results)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
+		}
+
+		c.Data(400, "application/json", []byte(body))
+		return
+	}
+
+	// Persist into database.
+	m.Name = company.Name
+	if company.Address != nil {
+		m.AddressLine1 = company.Address.Line1
+		m.AddressLine2 = company.Address.Line2
+		m.AddressCity = company.Address.City
+		m.AddressState = company.Address.State
+		m.AddressPostalCode = company.Address.PostalCode
+		m.AddressCountry = company.Address.Country
+	}
+	m.Website = company.Website
+	result = appCtx.DB.Updates(&m)
+	if result.Error != nil {
+		panic(fmt.Sprintf("Failed to persist Management Company in database: %+v\n", err))
+	}
+
+	// Get updated row.
+	m = models.ManagementCompany{}
+	result = appCtx.DB.Where("id_hash = ?", managementID).First(&m)
+	if result.Error != nil {
+		panic(fmt.Sprintf("Failed to get Management Company from database: %+v\n", err))
+	}
+
+	// Serialize row into JSON.
+	company = serializers.ManagementCompany{
+		ID:   m.IDHash,
+		Name: m.Name,
+		Address: &serializers.Address{
+			Line1:      m.AddressLine1,
+			Line2:      m.AddressLine2,
+			City:       m.AddressCity,
+			State:      m.AddressState,
+			PostalCode: m.AddressPostalCode,
+			Country:    m.AddressCountry,
+		},
+		Website: m.Website,
+	}
+	body, err := json.Marshal(company)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
+	}
+
+	c.Data(200, "application/json", body)
+}

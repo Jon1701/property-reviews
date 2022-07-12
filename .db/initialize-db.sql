@@ -1,17 +1,17 @@
-/* Create application user */
-DO
-$do$
-BEGIN
-	IF EXISTS (SELECT FROM pg_user WHERE usename='appuser') THEN
-		RAISE NOTICE 'Skipping application user creation due to existing user';
-	ELSE
-		CREATE USER appuser WITH PASSWORD 'appuser';
-	END IF;
-END
-$do$;
+-- /* Create application user */
+-- DO
+-- $do$
+-- BEGIN
+-- 	IF EXISTS (SELECT FROM pg_user WHERE usename='appuser') THEN
+-- 		RAISE NOTICE 'Skipping application user creation due to existing user';
+-- 	ELSE
+-- 		CREATE USER appuser WITH PASSWORD 'appuser';
+-- 	END IF;
+-- END
+-- $do$;
 
-/* Enable module to generate UUIDs */
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- /* Enable module to generate UUIDs */
+-- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 /* Create Users table */
 CREATE TABLE IF NOT EXISTS users (

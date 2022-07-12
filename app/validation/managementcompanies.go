@@ -16,7 +16,7 @@ type Address struct {
 
 type ManagementCompany struct {
 	Name    *errormessages.ErrorMessage `json:"name,omitempty"`
-	Address *Address                    `json:"password,omitempty"`
+	Address *Address                    `json:"address,omitempty"`
 	Website *errormessages.ErrorMessage `json:"website,omitempty"`
 }
 

@@ -3,14 +3,14 @@ package validation
 import (
 	"regexp"
 
-	"github.com/Jon1701/property-reviews/app/errors"
+	"github.com/Jon1701/property-reviews/app/errormessages"
 	"github.com/Jon1701/property-reviews/app/serializers"
 )
 
 type User struct {
-	Username     *errors.ErrorMessage `json:"username,omitempty"`
-	Password     *errors.ErrorMessage `json:"password,omitempty"`
-	EmailAddress *errors.ErrorMessage `json:"emailAddress,omitempty"`
+	Username     *errormessages.ErrorMessage `json:"username,omitempty"`
+	Password     *errormessages.ErrorMessage `json:"password,omitempty"`
+	EmailAddress *errormessages.ErrorMessage `json:"emailAddress,omitempty"`
 }
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
@@ -22,13 +22,13 @@ func ValidateCreateUser(user serializers.User) *User {
 
 	if user.Password == nil {
 		// No password.
-		msg := errors.PasswordInvalidFieldLength
+		msg := errormessages.PasswordInvalidFieldLength
 		results.Password = &msg
 		passValidation = false
 	} else {
 		// Length check.
-		if len(*user.Password) < errors.PasswordMinLength || len(*user.Password) > errors.PasswordMaxLength {
-			msg := errors.PasswordInvalidFieldLength
+		if len(*user.Password) < errormessages.PasswordMinLength || len(*user.Password) > errormessages.PasswordMaxLength {
+			msg := errormessages.PasswordInvalidFieldLength
 			results.Password = &msg
 			passValidation = false
 		}
@@ -36,19 +36,19 @@ func ValidateCreateUser(user serializers.User) *User {
 
 	if user.EmailAddress == nil {
 		// No email address.
-		msg := errors.EmailAddressRequired
+		msg := errormessages.EmailAddressRequired
 		results.EmailAddress = &msg
 		passValidation = false
 	} else {
 		// Length check.
-		if len(*user.EmailAddress) <= errors.EmailAddressMinLength || len(*user.EmailAddress) > errors.EmailAddressMaxLength {
-			msg := errors.EmailAddressInvalidFieldLength
+		if len(*user.EmailAddress) <= errormessages.EmailAddressMinLength || len(*user.EmailAddress) > errormessages.EmailAddressMaxLength {
+			msg := errormessages.EmailAddressInvalidFieldLength
 			results.EmailAddress = &msg
 			passValidation = false
 		} else {
 			// Valid email check.
 			if !emailRegex.MatchString(*user.EmailAddress) {
-				msg := errors.EmailAddressRequired
+				msg := errormessages.EmailAddressRequired
 				results.EmailAddress = &msg
 				passValidation = false
 			}

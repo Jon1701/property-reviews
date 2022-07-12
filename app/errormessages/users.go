@@ -1,4 +1,4 @@
-package errors
+package errormessages
 
 const (
 	PasswordMinLength     int = 8

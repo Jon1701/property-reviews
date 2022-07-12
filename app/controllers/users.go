@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/Jon1701/property-reviews/app/errors"
+	"github.com/Jon1701/property-reviews/app/errormessages"
 	"github.com/Jon1701/property-reviews/app/models"
 	"github.com/Jon1701/property-reviews/app/serializers"
 	"github.com/Jon1701/property-reviews/app/validation"
@@ -50,7 +50,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	// Read request body.
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		msg := errors.FailedToParseRequestBody
+		msg := errormessages.FailedToParseRequestBody
 		c.JSON(400, gin.H{
 			"message": &msg,
 		})
@@ -60,7 +60,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	// Parse request body.
 	err = json.Unmarshal(data, &user)
 	if err != nil {
-		msg := errors.FailedToParseRequestBody
+		msg := errormessages.FailedToParseRequestBody
 		c.JSON(400, gin.H{
 			"message": &msg,
 		})
@@ -83,7 +83,7 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	m := models.User{}
 	appCtx.DB.Where("email_address = ?", user.EmailAddress).First(&m)
 	if m.IDHash != nil {
-		msg := errors.EmailAddressAlreadyRegistered
+		msg := errormessages.EmailAddressAlreadyRegistered
 
 		v := validation.User{EmailAddress: &msg}
 		body, err := json.Marshal(v)

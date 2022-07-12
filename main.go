@@ -17,6 +17,12 @@ func main() {
 		panic(fmt.Sprintf("Failed to connect to the database: %v\n", err))
 	}
 
+	// Exit if JWT signing key not provided.
+	jwtSigningKey := os.Getenv("JWT_SIGNING_KEY")
+	if len(jwtSigningKey) == 0 {
+		panic("Missing Environment Variable: JWT_SIGNING_KEY")
+	}
+
 	appCtx := controllers.New(db)
 
 	r := gin.Default()

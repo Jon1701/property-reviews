@@ -7,6 +7,8 @@ POSTGRES_ADMIN_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADM
 
 POSTGRES_APP_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADMIN_PASSWORD}@localhost/${POSTGRES_DB}
 
+JWT_SIGNING_KEY=031a9c015be2438bbf9ffbb1e2911038
+
 # Starts services and initializes the database.
 start: stop-services start-services wait-5s initialize-db
 
@@ -50,6 +52,7 @@ run:
 	@echo "Running main.go"
 	SERVER_PORT=${SERVER_PORT} \
 	POSTGRES_APP_CONNSTRING=${POSTGRES_APP_CONNSTRING} \
+	JWT_SIGNING_KEY=${JWT_SIGNING_KEY} \
 		go run main.go
 	@echo "Done running main.go"
 

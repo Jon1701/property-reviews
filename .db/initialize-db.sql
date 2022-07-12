@@ -19,9 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
 								PRIMARY KEY
 								NOT NULL,
 
-	id_hash				UUID
-								NOT NULL
-								DEFAULT uuid_generate_v4(),
+	id_hash				CHAR(50)
+								UNIQUE
+								NOT NULL,
 
 	username			VARCHAR(50)
 								NOT NULL,

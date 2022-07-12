@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
 								PRIMARY KEY
 								NOT NULL,
 
-	id_hash				CHAR(50)
+	id_hash				VARCHAR(50)
 								UNIQUE
 								NOT NULL,
 
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS management_companies (
 											PRIMARY KEY
 											NOT NULL,
 
-	id_hash							CHAR(50)
+	id_hash							VARCHAR(50)
 											UNIQUE
 											NOT NULL,
 

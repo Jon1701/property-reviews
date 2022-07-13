@@ -45,12 +45,16 @@ func main() {
 	api := r.Group("/api")
 	users := api.Group("/users")
 	management := api.Group("/management")
+	properties := api.Group("/property")
 
 	// Register /api/users/*.
 	routes.RegisterUserRoutes(&appCtx, users)
 
 	// Register /api/management/*.
 	routes.RegisterManagementCompaniesRoutes(&appCtx, management)
+
+	// Register /api/property/*.
+	routes.RegisterPropertiesRoutes(&appCtx, properties)
 
 	// Run server.
 	err = r.Run(fmt.Sprintf(":%s", serverPort))

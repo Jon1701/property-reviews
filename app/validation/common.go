@@ -7,6 +7,15 @@ import (
 	"github.com/Jon1701/property-reviews/app/serializers"
 )
 
+type Address struct {
+	Line1      *errormessages.ErrorMessage `json:"line1,omitempty"`
+	Line2      *errormessages.ErrorMessage `json:"line2,omitempty"`
+	City       *errormessages.ErrorMessage `json:"city,omitempty"`
+	State      *errormessages.ErrorMessage `json:"state,omitempty"`
+	PostalCode *errormessages.ErrorMessage `json:"postalCode,omitempty"`
+	Country    *errormessages.ErrorMessage `json:"country,omitempty"`
+}
+
 // Checks if a given URL is valid.
 func IsValidURL(s string) bool {
 	_, err := url.ParseRequestURI(s)

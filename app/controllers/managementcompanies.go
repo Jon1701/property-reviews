@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Jon1701/property-reviews/app/errormessages"
 	"github.com/Jon1701/property-reviews/app/models"
 	"github.com/Jon1701/property-reviews/app/serializers"
 	"github.com/Jon1701/property-reviews/app/validation"
@@ -25,7 +26,14 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 	company := serializers.ManagementCompany{}
 
 	// Serialize the request body, respond with Bad Request if unable to.
-	SerializeRequestBodyAndRespondIfErrored(c, &company)
+	err := SerializeRequestBody(c, &company)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": &msg,
+		})
+		return
+	}
 
 	// Field validation.
 	results := validation.ValidateCreateManagementCompany(company)
@@ -79,7 +87,14 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	}
 
 	// Serialize the request body, respond with Bad Request if unable to.
-	SerializeRequestBodyAndRespondIfErrored(c, &company)
+	err := SerializeRequestBody(c, &company)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": &msg,
+		})
+		return
+	}
 
 	// Field validation.
 	results := validation.ValidateUpdateManagementCompany(company)

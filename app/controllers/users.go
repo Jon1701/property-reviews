@@ -48,7 +48,14 @@ func (appCtx *AppContext) CreateUser(c *gin.Context) {
 	user := serializers.User{}
 
 	// Serialize the request body, respond with Bad Request if unable to.
-	SerializeRequestBodyAndRespondIfErrored(c, &user)
+	err := SerializeRequestBody(c, &user)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": &msg,
+		})
+		return
+	}
 
 	// Validation request body object.
 	results := validation.ValidateCreateUser(user)
@@ -105,7 +112,14 @@ func (appCtx *AppContext) UserLogin(c *gin.Context) {
 	user := serializers.User{}
 
 	// Serialize the request body, respond with Bad Request if unable to.
-	SerializeRequestBodyAndRespondIfErrored(c, &user)
+	err := SerializeRequestBody(c, &user)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": &msg,
+		})
+		return
+	}
 
 	// Validation request body object.
 	results := validation.ValidateUserLogin(user)

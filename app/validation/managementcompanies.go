@@ -6,6 +6,7 @@ import (
 )
 
 type ManagementCompany struct {
+	ID      *errormessages.ErrorMessage `json:"id,omitempty"`
 	Name    *errormessages.ErrorMessage `json:"name,omitempty"`
 	Address *Address                    `json:"address,omitempty"`
 	Website *errormessages.ErrorMessage `json:"website,omitempty"`

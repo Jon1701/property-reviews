@@ -41,3 +41,10 @@ func FieldMustBeBetweenXandYCharactersInLength(minLength int, maxLength int) Err
 	msg := fmt.Sprintf("field must be between %d and %d characters in length", minLength, maxLength)
 	return ErrorMessage(msg)
 }
+
+// Generates an error message indicating that a field must have one value in an
+// array of values.
+func FieldMustBeOneOf(values string) ErrorMessage {
+	msg := fmt.Sprintf("field must be one of: %s", values)
+	return ErrorMessage(msg)
+}

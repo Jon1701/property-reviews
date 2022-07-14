@@ -32,4 +32,7 @@ type Property struct {
 
 	// Neighborhood.
 	Neighborhood *string `gorm:"column:neighborhood"`
+
+	// ID Hash of the Management Company.
+	ManagementCompanyIDHash *string `gorm:"column:management_company_id_hash"`
 }

@@ -6,3 +6,4 @@ const (
 )
 
 var ManagementCompanyNameInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(ManagementCompanyNameMinLength, ManagementCompanyNameMaxLength)
+var ManagementCompanyIDNotFound ErrorMessage = ErrorMessage("management company not found")

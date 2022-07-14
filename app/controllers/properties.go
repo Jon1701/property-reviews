@@ -44,6 +44,28 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 		}
 
 		c.Data(http.StatusBadRequest, "application/json", body)
+		return
+	}
+
+	// If a Management Company ID was provided, check if it exists in the table.
+	company := models.ManagementCompany{}
+	if property.ManagementCompany != nil && property.ManagementCompany.ID != nil {
+		result := appCtx.DB.Where("id_hash = ?", property.ManagementCompany.ID).First(&company)
+		if result.Error != nil {
+			validationResults := validation.Property{
+				ManagementCompany: &validation.ManagementCompany{
+					ID: &errormessages.ManagementCompanyIDNotFound,
+				},
+			}
+
+			body, err := json.Marshal(validationResults)
+			if err != nil {
+				panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
+			}
+
+			c.Data(http.StatusBadRequest, "application/json", body)
+			return
+		}
 	}
 
 	// Persist into database.
@@ -63,6 +85,9 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	}
 	if property.Neighborhood != nil {
 		m.Neighborhood = property.Neighborhood
+	}
+	if property.ManagementCompany != nil && property.ManagementCompany.ID != nil {
+		m.ManagementCompanyIDHash = property.ManagementCompany.ID
 	}
 	result := appCtx.DB.Create(&m)
 	if result.Error != nil {
@@ -109,6 +134,31 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		return
 	}
 
+	isManagementCompanyIDHashProvided := property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) > 0
+	isManagementCompanyIDHashEmptyString := property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) == 0
+
+	// If a non-blank Management Company ID was provided, check if it exists in
+	// the table.
+	company := models.ManagementCompany{}
+	if isManagementCompanyIDHashProvided {
+		result := appCtx.DB.Where("id_hash = ?", property.ManagementCompany.ID).First(&company)
+		if result.Error != nil {
+			validationResults := validation.Property{
+				ManagementCompany: &validation.ManagementCompany{
+					ID: &errormessages.ManagementCompanyIDNotFound,
+				},
+			}
+
+			body, err := json.Marshal(validationResults)
+			if err != nil {
+				panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
+			}
+
+			c.Data(http.StatusBadRequest, "application/json", body)
+			return
+		}
+	}
+
 	// Persist into database.
 	m.PropertyType = (*string)(property.PropertyType)
 	m.BuildingType = (*string)(property.BuildingType)
@@ -121,9 +171,20 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		m.AddressPostalCode = property.Address.PostalCode
 		m.AddressCountry = property.Address.Country
 	}
+	if isManagementCompanyIDHashProvided {
+		m.ManagementCompanyIDHash = property.ManagementCompany.ID
+	}
 	result = appCtx.DB.Updates(&m)
 	if result.Error != nil {
 		panic(fmt.Sprintf("Failed to update Property in database: %+v\n", result.Error))
+	}
+	// If the Management Company ID is an empty string, clear that value
+	// in the database.
+	if isManagementCompanyIDHashEmptyString {
+		result := appCtx.DB.Model(&m).Select("management_company_id_hash").Updates(map[string]interface{}{"management_company_id_hash": nil})
+		if result.Error != nil {
+			panic(fmt.Sprintf("Failed to delete the Management Company ID in database: %+v\n", result.Error))
+		}
 	}
 
 	// Get updated Property.
@@ -147,6 +208,11 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 			PostalCode: m.AddressPostalCode,
 			Country:    m.AddressCountry,
 		},
+	}
+	if m.ManagementCompanyIDHash != nil {
+		property.ManagementCompany = &serializers.ManagementCompany{
+			ID: m.ManagementCompanyIDHash,
+		}
 	}
 	body, err := json.Marshal(property)
 	if err != nil {

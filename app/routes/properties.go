@@ -8,4 +8,5 @@ import (
 // Registers the routes under the /api/property group.
 func RegisterPropertiesRoutes(appCtx *controllers.AppContext, rg *gin.RouterGroup) {
 	rg.POST("/", appCtx.CreateProperty)
+	rg.PATCH("/:propertyID", appCtx.UpdateProperty)
 }

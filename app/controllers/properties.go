@@ -72,3 +72,86 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	c.Header("Location", fmt.Sprintf("/api/property/%s", idHash))
 	c.JSON(http.StatusNoContent, nil)
 }
+
+// Updates a Property.
+func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
+	propertyID := c.Param("propertyID")
+
+	// Check if Property exists in the database.
+	m := models.Property{}
+	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, &gin.H{
+			"message": &errormessages.PropertyNotFound,
+		})
+		return
+	}
+
+	// Serialize response body.
+	property := serializers.Property{}
+	err := SerializeRequestBody(c, &property)
+	if err != nil {
+		msg := errormessages.FailedToParseRequestBody
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": &msg,
+		})
+		return
+	}
+
+	// Validate fields.
+	results := validation.ValidateUpdateProperty(property)
+	if results != nil {
+		body, err := json.Marshal(results)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
+		}
+		c.Data(http.StatusBadRequest, "application/json", body)
+		return
+	}
+
+	// Persist into database.
+	m.PropertyType = (*string)(property.PropertyType)
+	m.BuildingType = (*string)(property.BuildingType)
+	m.Neighborhood = property.Neighborhood
+	if property.Address != nil {
+		m.AddressLine1 = property.Address.Line1
+		m.AddressLine2 = property.Address.Line2
+		m.AddressCity = property.Address.City
+		m.AddressState = property.Address.State
+		m.AddressPostalCode = property.Address.PostalCode
+		m.AddressCountry = property.Address.Country
+	}
+	result = appCtx.DB.Updates(&m)
+	if result.Error != nil {
+		panic(fmt.Sprintf("Failed to update Property in database: %+v\n", result.Error))
+	}
+
+	// Get updated Property.
+	m = models.Property{}
+	result = appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
+	if result.Error != nil {
+		panic(fmt.Sprintf("Failed to get Property from the database: %+v\n", result.Error))
+	}
+
+	// Serialize row into JSON.
+	property = serializers.Property{
+		ID:           &propertyID,
+		PropertyType: (*serializers.PropertyType)(m.PropertyType),
+		BuildingType: (*serializers.BuildingType)(m.BuildingType),
+		Neighborhood: m.Neighborhood,
+		Address: &serializers.Address{
+			Line1:      m.AddressLine1,
+			Line2:      m.AddressLine2,
+			City:       m.AddressCity,
+			State:      m.AddressState,
+			PostalCode: m.AddressPostalCode,
+			Country:    m.AddressCountry,
+		},
+	}
+	body, err := json.Marshal(property)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
+}

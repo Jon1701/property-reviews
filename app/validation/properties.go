@@ -6,10 +6,11 @@ import (
 )
 
 type Property struct {
-	Address      *Address                    `json:"address,omitempty"`
-	Neighborhood *errormessages.ErrorMessage `json:"neighborhood,omitempty"`
-	PropertyType *errormessages.ErrorMessage `json:"propertyType,omitempty"`
-	BuildingType *errormessages.ErrorMessage `json:"buildingType,omitempty"`
+	Address           *Address                    `json:"address,omitempty"`
+	Neighborhood      *errormessages.ErrorMessage `json:"neighborhood,omitempty"`
+	PropertyType      *errormessages.ErrorMessage `json:"propertyType,omitempty"`
+	ManagementCompany *ManagementCompany          `json:"managementCompany,omitempty"`
+	BuildingType      *errormessages.ErrorMessage `json:"buildingType,omitempty"`
 }
 
 // Performs field validation for Property struct values under the
@@ -56,6 +57,15 @@ func ValidateCreateProperty(property serializers.Property) *Property {
 			results.BuildingType = &errormessages.PropertyInvalidBuildingType
 			passValidation = false
 		}
+	}
+
+	// Check Property Management ID.
+	if property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) == 0 {
+		msg := errormessages.FieldValueRequired
+		results.ManagementCompany = &ManagementCompany{
+			ID: &msg,
+		}
+		passValidation = false
 	}
 
 	if passValidation {

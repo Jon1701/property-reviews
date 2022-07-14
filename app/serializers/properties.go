@@ -21,9 +21,10 @@ var TypesOfBuildings = map[string]BuildingType{
 }
 
 type Property struct {
-	ID           *string       `json:"id,omitempty"`
-	Address      *Address      `json:"address,omitempty"`
-	Neighborhood *string       `json:"neighborhood,omitempty"`
-	PropertyType *PropertyType `json:"propertyType,omitempty"`
-	BuildingType *BuildingType `json:"buildingType,omitempty"`
+	ID                *string            `json:"id,omitempty"`
+	Address           *Address           `json:"address,omitempty"`
+	Neighborhood      *string            `json:"neighborhood,omitempty"`
+	PropertyType      *PropertyType      `json:"propertyType,omitempty"`
+	BuildingType      *BuildingType      `json:"buildingType,omitempty"`
+	ManagementCompany *ManagementCompany `json:"managementCompany,omitempty"`
 }

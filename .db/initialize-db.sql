@@ -59,7 +59,9 @@ CREATE TABLE IF NOT EXISTS properties (
 	id_hash							VARCHAR(50)
 											UNIQUE
 											NOT NULL,
-	
+
+	management_company_id_hash	VARCHAR(50),
+
 	address_line1				VARCHAR(1000)
 											NOT NULL,
 
@@ -83,5 +85,9 @@ CREATE TABLE IF NOT EXISTS properties (
 	building_type				VARCHAR(50)
 											NOT NULL,
 
-	neighborhood				VARCHAR(255)
+	neighborhood				VARCHAR(255),
+
+	CONSTRAINT fk_management_company
+		FOREIGN KEY(management_company_id_hash)
+			REFERENCES management_companies(id_hash)	
 );

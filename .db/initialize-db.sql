@@ -48,4 +48,40 @@ CREATE TABLE IF NOT EXISTS management_companies (
 											NOT NULL,
 	
 	website							VARCHAR(255)
-) 
+);
+
+/* Create Properties table */
+CREATE TABLE IF NOT EXISTS properties (
+	id									SERIAL
+											PRIMARY KEY
+											NOT NULL,
+
+	id_hash							VARCHAR(50)
+											UNIQUE
+											NOT NULL,
+	
+	address_line1				VARCHAR(1000)
+											NOT NULL,
+
+	address_line2				VARCHAR(1000),
+
+	address_city				VARCHAR(1000)
+											NOT NULL,
+
+	address_state				VARCHAR(1000)
+											NOT NULL,
+
+	address_postal_code	VARCHAR(20)
+											NOT NULL,
+
+	address_country			VARCHAR(100)
+											NOT NULL,
+	
+	property_type				VARCHAR(50)
+											NOT NULL,
+
+	building_type				VARCHAR(50)
+											NOT NULL,
+
+	neighborhood				VARCHAR(255)
+);

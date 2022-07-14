@@ -24,6 +24,7 @@ var strArrayBuildingTypes string
 var PropertyNeighborhoodInvalidFieldLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(PropertyNeighborhoodMinLength, PropertyNeighborhoodMaxLength)
 var PropertyInvalidPropertyType ErrorMessage
 var PropertyInvalidBuildingType ErrorMessage
+var PropertyNotFound ErrorMessage = "property not found"
 
 func init() {
 	// Build arrays of Building/Property Types.

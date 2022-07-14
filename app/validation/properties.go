@@ -65,6 +65,55 @@ func ValidateCreateProperty(property serializers.Property) *Property {
 	return &results
 }
 
+// Performs field validation for Property struct values under the
+// Update Property route.
+func ValidateUpdateProperty(property serializers.Property) *Property {
+	results := Property{}
+	passValidation := true
+
+	// Check Address validity.
+	if property.Address != nil {
+		resultsAddress := ValidateAddressIgnoreNil(property.Address)
+		if resultsAddress != nil {
+			results.Address = resultsAddress
+			passValidation = false
+		}
+	}
+
+	// Check Neighborhood validity.
+	if property.Neighborhood != nil {
+		minLength := errormessages.PropertyNeighborhoodMinLength
+		maxLength := errormessages.PropertyNeighborhoodMaxLength
+		isValidLength := len(*property.Neighborhood) >= minLength && len(*property.Neighborhood) <= maxLength
+		if !isValidLength {
+			results.Neighborhood = &errormessages.PropertyNeighborhoodInvalidFieldLength
+			passValidation = false
+		}
+	}
+
+	// Check Property Type.
+	if property.PropertyType != nil {
+		if !isInArrayOfPropertyTypes(*property.PropertyType) {
+			results.PropertyType = &errormessages.PropertyInvalidPropertyType
+			passValidation = false
+		}
+	}
+
+	// Check Building Type.
+	if property.BuildingType != nil {
+		if !isInArrayOfBuildingTypes(*property.BuildingType) {
+			results.BuildingType = &errormessages.PropertyInvalidBuildingType
+			passValidation = false
+		}
+	}
+
+	if passValidation {
+		return nil
+	}
+
+	return &results
+}
+
 // Checks if a given Property Type is in the array of allowed Property Types.
 func isInArrayOfPropertyTypes(v serializers.PropertyType) bool {
 	isInArray := false

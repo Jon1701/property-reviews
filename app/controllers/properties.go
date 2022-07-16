@@ -159,7 +159,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		}
 	}
 
-	// Persist into database.
+	// Persist updated Property into database.
 	m.PropertyType = (*string)(property.PropertyType)
 	m.BuildingType = (*string)(property.BuildingType)
 	m.Neighborhood = property.Neighborhood
@@ -194,7 +194,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		panic(fmt.Sprintf("Failed to get Property from the database: %+v\n", result.Error))
 	}
 
-	// Serialize row into JSON.
+	// Prepare to serialize Property row into JSON.
 	property = serializers.Property{
 		ID:           &propertyID,
 		PropertyType: (*serializers.PropertyType)(m.PropertyType),
@@ -209,11 +209,37 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 			Country:    m.AddressCountry,
 		},
 	}
-	if m.ManagementCompanyIDHash != nil {
-		property.ManagementCompany = &serializers.ManagementCompany{
-			ID: m.ManagementCompanyIDHash,
+
+	// Get Management Company.
+	if isManagementCompanyIDHashProvided {
+		companyID := *m.ManagementCompanyIDHash
+
+		// Get row.
+		m := models.ManagementCompany{}
+		result := appCtx.DB.Where("id_hash = ?", companyID).First(&m)
+		if result.Error != nil {
+			panic(fmt.Sprintf("Failed to get Management Company by ID Hash despite ID Hash provided: %+v\n", result.Error))
 		}
+
+		// Serialize into struct.
+		company := serializers.ManagementCompany{
+			ID:   m.IDHash,
+			Name: m.Name,
+			Address: &serializers.Address{
+				Line1:      m.AddressLine1,
+				Line2:      m.AddressLine2,
+				City:       m.AddressCity,
+				State:      m.AddressState,
+				PostalCode: m.AddressPostalCode,
+				Country:    m.AddressCountry,
+			},
+			Website: m.Website,
+		}
+
+		// Attach Company struct to Property struct.
+		property.ManagementCompany = &company
 	}
+
 	body, err := json.Marshal(property)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))

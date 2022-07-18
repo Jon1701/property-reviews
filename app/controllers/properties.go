@@ -134,11 +134,10 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		return
 	}
 
+	// Check if the Management Company ID Hash provided.
 	isManagementCompanyIDHashProvided := property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) > 0
-	isManagementCompanyIDHashEmptyString := property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) == 0
 
-	// If a non-blank Management Company ID was provided, check if it exists in
-	// the table.
+	// If a Management Company ID was provided, check if it exists in the table.
 	company := models.ManagementCompany{}
 	if isManagementCompanyIDHashProvided {
 		result := appCtx.DB.Where("id_hash = ?", property.ManagementCompany.ID).First(&company)
@@ -178,18 +177,35 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	if result.Error != nil {
 		panic(fmt.Sprintf("Failed to update Property in database: %+v\n", result.Error))
 	}
-	// If the Management Company ID is an empty string, clear that value
+	// If the Management Company ID is not provided, remove it from the Property
 	// in the database.
-	if isManagementCompanyIDHashEmptyString {
+	if !isManagementCompanyIDHashProvided {
 		result := appCtx.DB.Model(&m).Select("management_company_id_hash").Updates(map[string]interface{}{"management_company_id_hash": nil})
 		if result.Error != nil {
 			panic(fmt.Sprintf("Failed to delete the Management Company ID in database: %+v\n", result.Error))
 		}
 	}
 
+	// Get the Property row and serialize it for JSON.
+	s, err := appCtx.DBGetPropertySerialized(propertyID, isManagementCompanyIDHashProvided)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get the Property from the database: %+v", err))
+	}
+
+	// Convert to JSON.
+	body, err := json.Marshal(s)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
+}
+
+// Gets a Property and Serializes it.
+func (appCtx *AppContext) DBGetPropertySerialized(propertyID string, isManagementCompanyIDHashProvided bool) (*serializers.Property, error) {
 	// Get the updated Property from the database.
 	pwmc := &models.PropertyWithManageCompany{}
-	appCtx.DB.Raw(fmt.Sprintf(`
+	result := appCtx.DB.Raw(fmt.Sprintf(`
 		SELECT
 			properties.id_hash							AS properties_id_hash,
 			properties.address_line1 				AS properties_address_line1,
@@ -218,9 +234,12 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 			properties.management_company_id_hash = management_companies.id_hash
 		WHERE
 			properties.id_hash = '%s';`, propertyID)).Find(&pwmc)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 
 	// Serialize the Property Model.
-	s := &serializers.Property{
+	property := &serializers.Property{
 		ID: pwmc.PropertyIDHash,
 		Address: &serializers.Address{
 			Line1:      pwmc.PropertyAddressLine1,
@@ -237,7 +256,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	// If the Management Company ID Hash is provided, include the Management
 	// Company object.
 	if isManagementCompanyIDHashProvided {
-		s.ManagementCompany = &serializers.ManagementCompany{
+		property.ManagementCompany = &serializers.ManagementCompany{
 			ID:   pwmc.ManagementCompanyIDHash,
 			Name: pwmc.ManagementCompanyName,
 			Address: &serializers.Address{
@@ -251,11 +270,5 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		}
 	}
 
-	// Convert to JSON.
-	body, err := json.Marshal(s)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
-	}
-
-	c.Data(http.StatusOK, "application/json", body)
+	return property, nil
 }

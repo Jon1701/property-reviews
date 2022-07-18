@@ -187,60 +187,72 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 		}
 	}
 
-	// Get updated Property.
-	m = models.Property{}
-	result = appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
-	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to get Property from the database: %+v\n", result.Error))
-	}
+	// Get the updated Property from the database.
+	pwmc := &models.PropertyWithManageCompany{}
+	appCtx.DB.Raw(fmt.Sprintf(`
+		SELECT
+			properties.id_hash							AS properties_id_hash,
+			properties.address_line1 				AS properties_address_line1,
+			properties.address_line2 				AS properties_address_line2,
+			properties.address_city 				AS properties_address_city,
+			properties.address_state 				AS properties_address_state,
+			properties.address_postal_code 	AS properties_address_postal_code,
+			properties.address_country 			AS properties_address_country,
+			properties.property_type 				AS properties_property_type,
+			properties.building_type 				AS properties_building_type,
+			properties.neighborhood 				AS properties_neighborhood,
+			management_companies.id_hash 		AS management_companies_id_hash,
+			management_companies.name 			AS management_companies_name,
+			management_companies.address_line1 				AS management_companies_address_line1,
+			management_companies.address_line2 				AS management_companies_address_line2,
+			management_companies.address_city 				AS management_companies_address_city,
+			management_companies.address_state 				AS management_companies_address_state,
+			management_companies.address_postal_code 	AS management_companies_address_postal_code,
+			management_companies.address_country 			AS management_companies_address_country,
+			management_companies.website 							AS management_companies_website	
+		FROM
+			properties
+		LEFT JOIN
+			management_companies
+		ON
+			properties.management_company_id_hash = management_companies.id_hash
+		WHERE
+			properties.id_hash = '%s';`, propertyID)).Find(&pwmc)
 
-	// Prepare to serialize Property row into JSON.
-	property = serializers.Property{
-		ID:           &propertyID,
-		PropertyType: (*serializers.PropertyType)(m.PropertyType),
-		BuildingType: (*serializers.BuildingType)(m.BuildingType),
-		Neighborhood: m.Neighborhood,
+	// Serialize the Property Model.
+	s := &serializers.Property{
+		ID: pwmc.PropertyIDHash,
 		Address: &serializers.Address{
-			Line1:      m.AddressLine1,
-			Line2:      m.AddressLine2,
-			City:       m.AddressCity,
-			State:      m.AddressState,
-			PostalCode: m.AddressPostalCode,
-			Country:    m.AddressCountry,
+			Line1:      pwmc.PropertyAddressLine1,
+			Line2:      pwmc.PropertyAddressLine2,
+			City:       pwmc.PropertyAddressCity,
+			State:      pwmc.PropertyAddressState,
+			PostalCode: pwmc.PropertyAddressPostalCode,
+			Country:    pwmc.PropertyAddressCountry,
 		},
+		BuildingType: (*serializers.BuildingType)(pwmc.PropertyBuildingType),
+		PropertyType: (*serializers.PropertyType)(pwmc.PropertyType),
+		Neighborhood: pwmc.PropertyNeighborhood,
 	}
-
-	// Get Management Company.
+	// If the Management Company ID Hash is provided, include the Management
+	// Company object.
 	if isManagementCompanyIDHashProvided {
-		companyID := *m.ManagementCompanyIDHash
-
-		// Get row.
-		m := models.ManagementCompany{}
-		result := appCtx.DB.Where("id_hash = ?", companyID).First(&m)
-		if result.Error != nil {
-			panic(fmt.Sprintf("Failed to get Management Company by ID Hash despite ID Hash provided: %+v\n", result.Error))
-		}
-
-		// Serialize into struct.
-		company := serializers.ManagementCompany{
-			ID:   m.IDHash,
-			Name: m.Name,
+		s.ManagementCompany = &serializers.ManagementCompany{
+			ID:   pwmc.ManagementCompanyIDHash,
+			Name: pwmc.ManagementCompanyName,
 			Address: &serializers.Address{
-				Line1:      m.AddressLine1,
-				Line2:      m.AddressLine2,
-				City:       m.AddressCity,
-				State:      m.AddressState,
-				PostalCode: m.AddressPostalCode,
-				Country:    m.AddressCountry,
+				Line1:      pwmc.ManagementCompanyAddressLine1,
+				Line2:      pwmc.ManagementCompanyAddressLine2,
+				City:       pwmc.ManagementCompanyAddressCity,
+				State:      pwmc.ManagementCompanyAddressState,
+				PostalCode: pwmc.ManagementCompanyAddressPostalCode,
+				Country:    pwmc.ManagementCompanyAddressCountry,
 			},
-			Website: m.Website,
 		}
-
-		// Attach Company struct to Property struct.
-		property.ManagementCompany = &company
 	}
 
-	body, err := json.Marshal(property)
+	// Convert to JSON.
+	body, err := json.Marshal(s)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
 	}

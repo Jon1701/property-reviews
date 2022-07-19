@@ -91,3 +91,74 @@ CREATE TABLE IF NOT EXISTS properties (
 		FOREIGN KEY(management_company_id_hash)
 			REFERENCES management_companies(id_hash)	
 );
+
+/* Create Reviews table. */
+CREATE TABLE IF NOT EXISTS reviews (
+	id									SERIAL
+											PRIMARY KEY
+											NOT NULL,
+
+	id_hash							VARCHAR(50)
+											UNIQUE
+											NOT NULL,
+
+	user_id_hash				VARCHAR(50),
+
+	property_id_hash		VARCHAR(50),
+
+	description					TEXT,
+
+	overall_rating			NUMERIC(3, 2),
+
+	management_rating		INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	maintenance_rating	INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	cleanliness_rating	INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	heating_rating			INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	storage_rating			INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	safety_rating				INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	cooling_rating			INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	parking_rating			INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	neighborhood_rating	INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	hotwater_rating			INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	amenities_rating		INT
+											NOT NULL
+											CHECK(management_rating BETWEEN 0 and 5),
+
+	CONSTRAINT fk_user
+	FOREIGN KEY(user_id_hash)
+		REFERENCES users(id_hash),
+
+	CONSTRAINT fk_property
+	FOREIGN KEY(property_id_hash)
+		REFERENCES properties(id_hash)
+);

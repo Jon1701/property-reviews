@@ -21,6 +21,13 @@ func generatePropertyIDHash() string {
 	return fmt.Sprintf("property_%s", id)
 }
 
+// Gets all Properties.
+func (appCtx *AppContext) GetProperties(c *gin.Context) {
+	c.JSON(http.StatusOK, &gin.H{
+		"message": "Successfully got Properties - Test Message",
+	})
+}
+
 // Creates a Property.
 func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	property := serializers.Property{}
@@ -187,7 +194,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	}
 
 	// Get the Property row and serialize it for JSON.
-	s, err := appCtx.DBGetPropertySerialized(propertyID, isManagementCompanyIDHashProvided)
+	s, err := appCtx.DBGetPropertySerializedByID(propertyID, isManagementCompanyIDHashProvided)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to get the Property from the database: %+v", err))
 	}
@@ -202,7 +209,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 }
 
 // Gets a Property and Serializes it.
-func (appCtx *AppContext) DBGetPropertySerialized(propertyID string, isManagementCompanyIDHashProvided bool) (*serializers.Property, error) {
+func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string, isManagementCompanyIDHashProvided bool) (*serializers.Property, error) {
 	// Get the updated Property from the database.
 	pwmc := &models.PropertyWithManageCompany{}
 	result := appCtx.DB.Raw(fmt.Sprintf(`

@@ -208,7 +208,8 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 // Gets a Property and Serializes it.
 func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string, isManagementCompanyIDHashProvided bool) (*serializers.Property, error) {
 	// Get the updated Property from the database.
-	pwmc := &models.PropertyWithManageCompany{}
+	m := &models.PropertyWithManageCompany{}
+
 	result := appCtx.DB.Raw(fmt.Sprintf(`
 		SELECT
 			properties.id_hash							AS properties_id_hash,
@@ -237,42 +238,13 @@ func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string, isManag
 		ON
 			properties.management_company_id_hash = management_companies.id_hash
 		WHERE
-			properties.id_hash = '%s';`, propertyID)).Find(&pwmc)
+			properties.id_hash = '%s';`, propertyID)).Find(&m)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	// Serialize the Property Model.
-	property := &serializers.Property{
-		ID: pwmc.PropertyIDHash,
-		Address: &serializers.Address{
-			Line1:      pwmc.PropertyAddressLine1,
-			Line2:      pwmc.PropertyAddressLine2,
-			City:       pwmc.PropertyAddressCity,
-			State:      pwmc.PropertyAddressState,
-			PostalCode: pwmc.PropertyAddressPostalCode,
-			Country:    pwmc.PropertyAddressCountry,
-		},
-		BuildingType: (*serializers.BuildingType)(pwmc.PropertyBuildingType),
-		PropertyType: (*serializers.PropertyType)(pwmc.PropertyType),
-		Neighborhood: pwmc.PropertyNeighborhood,
-	}
-	// If the Management Company ID Hash is provided, include the Management
-	// Company object.
-	if isManagementCompanyIDHashProvided {
-		property.ManagementCompany = &serializers.ManagementCompany{
-			ID:   pwmc.ManagementCompanyIDHash,
-			Name: pwmc.ManagementCompanyName,
-			Address: &serializers.Address{
-				Line1:      pwmc.ManagementCompanyAddressLine1,
-				Line2:      pwmc.ManagementCompanyAddressLine2,
-				City:       pwmc.ManagementCompanyAddressCity,
-				State:      pwmc.ManagementCompanyAddressState,
-				PostalCode: pwmc.ManagementCompanyAddressPostalCode,
-				Country:    pwmc.ManagementCompanyAddressCountry,
-			},
-		}
-	}
+	property := appCtx.DBSerializePropertyModel(*m)
 
 	return property, nil
 }
@@ -316,36 +288,43 @@ func (appCtx *AppContext) DBGetPropertiesSerialized() (*[]serializers.Property, 
 	// Serialize the model for JSON.
 	propertiesSerialized := []serializers.Property{}
 	for _, item := range propertiesModel {
-		property := &serializers.Property{
-			ID: item.PropertyIDHash,
-			Address: &serializers.Address{
-				Line1:      item.PropertyAddressLine1,
-				Line2:      item.PropertyAddressLine2,
-				City:       item.PropertyAddressCity,
-				State:      item.PropertyAddressState,
-				PostalCode: item.PropertyAddressPostalCode,
-				Country:    item.PropertyAddressCountry,
-			},
-			BuildingType: (*serializers.BuildingType)(item.PropertyBuildingType),
-			PropertyType: (*serializers.PropertyType)(item.PropertyType),
-			Neighborhood: item.PropertyNeighborhood,
-		}
-		if item.ManagementCompanyIDHash != nil {
-			property.ManagementCompany = &serializers.ManagementCompany{
-				ID:   item.ManagementCompanyIDHash,
-				Name: item.ManagementCompanyName,
-				Address: &serializers.Address{
-					Line1:      item.ManagementCompanyAddressLine1,
-					Line2:      item.ManagementCompanyAddressLine2,
-					City:       item.ManagementCompanyAddressCity,
-					State:      item.ManagementCompanyAddressState,
-					PostalCode: item.ManagementCompanyAddressPostalCode,
-					Country:    item.ManagementCompanyAddressCountry,
-				},
-			}
-		}
+		property := appCtx.DBSerializePropertyModel(item)
 		propertiesSerialized = append(propertiesSerialized, *property)
 	}
 
 	return &propertiesSerialized, nil
+}
+
+// Serializes a Property Model for JSON.
+func (appCtx *AppContext) DBSerializePropertyModel(m models.PropertyWithManageCompany) *serializers.Property {
+	property := &serializers.Property{
+		ID: m.PropertyIDHash,
+		Address: &serializers.Address{
+			Line1:      m.PropertyAddressLine1,
+			Line2:      m.PropertyAddressLine2,
+			City:       m.PropertyAddressCity,
+			State:      m.PropertyAddressState,
+			PostalCode: m.PropertyAddressPostalCode,
+			Country:    m.PropertyAddressCountry,
+		},
+		BuildingType: (*serializers.BuildingType)(m.PropertyBuildingType),
+		PropertyType: (*serializers.PropertyType)(m.PropertyType),
+		Neighborhood: m.PropertyNeighborhood,
+	}
+	if m.ManagementCompanyIDHash != nil {
+		property.ManagementCompany = &serializers.ManagementCompany{
+			ID:   m.ManagementCompanyIDHash,
+			Name: m.ManagementCompanyName,
+			Address: &serializers.Address{
+				Line1:      m.ManagementCompanyAddressLine1,
+				Line2:      m.ManagementCompanyAddressLine2,
+				City:       m.ManagementCompanyAddressCity,
+				State:      m.ManagementCompanyAddressState,
+				PostalCode: m.ManagementCompanyAddressPostalCode,
+				Country:    m.ManagementCompanyAddressCountry,
+			},
+		}
+	}
+
+	return property
 }

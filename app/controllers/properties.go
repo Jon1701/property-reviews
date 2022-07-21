@@ -23,9 +23,6 @@ func generatePropertyIDHash() string {
 
 // Gets all Properties.
 func (appCtx *AppContext) GetProperties(c *gin.Context) {
-	c.JSON(http.StatusOK, &gin.H{
-		"message": "Successfully got Properties - Test Message",
-	})
 }
 
 // Creates a Property.
@@ -278,4 +275,77 @@ func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string, isManag
 	}
 
 	return property, nil
+}
+
+// Gets all Properties and Serializes them.
+func (appCtx *AppContext) DBGetPropertiesSerialized() (*[]serializers.Property, error) {
+	propertiesModel := []models.PropertyWithManageCompany{}
+
+	result := appCtx.DB.Raw(`
+	SELECT
+		properties.id_hash							AS properties_id_hash,
+		properties.address_line1 				AS properties_address_line1,
+		properties.address_line2 				AS properties_address_line2,
+		properties.address_city 				AS properties_address_city,
+		properties.address_state 				AS properties_address_state,
+		properties.address_postal_code 	AS properties_address_postal_code,
+		properties.address_country 			AS properties_address_country,
+		properties.property_type 				AS properties_property_type,
+		properties.building_type 				AS properties_building_type,
+		properties.neighborhood 				AS properties_neighborhood,
+		management_companies.id_hash 		AS management_companies_id_hash,
+		management_companies.name 			AS management_companies_name,
+		management_companies.address_line1 				AS management_companies_address_line1,
+		management_companies.address_line2 				AS management_companies_address_line2,
+		management_companies.address_city 				AS management_companies_address_city,
+		management_companies.address_state 				AS management_companies_address_state,
+		management_companies.address_postal_code 	AS management_companies_address_postal_code,
+		management_companies.address_country 			AS management_companies_address_country,
+		management_companies.website 							AS management_companies_website	
+	FROM
+		properties
+	LEFT JOIN
+		management_companies
+	ON
+		properties.management_company_id_hash = management_companies.id_hash
+	`).Scan(&propertiesModel)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Serialize the model for JSON.
+	propertiesSerialized := []serializers.Property{}
+	for _, item := range propertiesModel {
+		property := &serializers.Property{
+			ID: item.PropertyIDHash,
+			Address: &serializers.Address{
+				Line1:      item.PropertyAddressLine1,
+				Line2:      item.PropertyAddressLine2,
+				City:       item.PropertyAddressCity,
+				State:      item.PropertyAddressState,
+				PostalCode: item.PropertyAddressPostalCode,
+				Country:    item.PropertyAddressCountry,
+			},
+			BuildingType: (*serializers.BuildingType)(item.PropertyBuildingType),
+			PropertyType: (*serializers.PropertyType)(item.PropertyType),
+			Neighborhood: item.PropertyNeighborhood,
+		}
+		if item.ManagementCompanyIDHash != nil {
+			property.ManagementCompany = &serializers.ManagementCompany{
+				ID:   item.ManagementCompanyIDHash,
+				Name: item.ManagementCompanyName,
+				Address: &serializers.Address{
+					Line1:      item.ManagementCompanyAddressLine1,
+					Line2:      item.ManagementCompanyAddressLine2,
+					City:       item.ManagementCompanyAddressCity,
+					State:      item.ManagementCompanyAddressState,
+					PostalCode: item.ManagementCompanyAddressPostalCode,
+					Country:    item.ManagementCompanyAddressCountry,
+				},
+			}
+		}
+		propertiesSerialized = append(propertiesSerialized, *property)
+	}
+
+	return &propertiesSerialized, nil
 }

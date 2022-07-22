@@ -202,7 +202,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	}
 
 	// Get the Property row and serialize it for JSON.
-	s, err := appCtx.DBGetPropertySerializedByID(propertyID, isManagementCompanyIDHashProvided)
+	s, err := appCtx.DBGetPropertySerializedByID(propertyID)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to get the Property from the database: %+v", err))
 	}
@@ -217,7 +217,7 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 }
 
 // Gets a Property and Serializes it.
-func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string, isManagementCompanyIDHashProvided bool) (*serializers.Property, error) {
+func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string) (*serializers.Property, error) {
 	// Get the updated Property from the database.
 	m := &models.PropertyWithManageCompany{}
 

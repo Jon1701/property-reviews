@@ -10,4 +10,5 @@ func RegisterPropertiesRoutes(appCtx *controllers.AppContext, rg *gin.RouterGrou
 	rg.GET("/", appCtx.GetProperties)
 	rg.POST("/", appCtx.CreateProperty)
 	rg.PATCH("/:propertyID", appCtx.UpdateProperty)
+	rg.GET(":propertyID", appCtx.GetPropertyByID)
 }

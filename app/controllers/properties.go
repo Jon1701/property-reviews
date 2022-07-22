@@ -119,10 +119,10 @@ func (appCtx *AppContext) GetPropertyByID(c *gin.Context) {
 
 	// Check if Property exists in the database.
 	m := models.Property{}
-	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
-	if result.Error != nil {
+	result := appCtx.DBCheckIfPropertyIDExists(propertyID, &m)
+	if !result {
 		c.JSON(http.StatusNotFound, &gin.H{
-			"message": &errormessages.PropertyNotFound,
+			"message": errormessages.PropertyNotFound,
 		})
 		return
 	}
@@ -148,8 +148,8 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 
 	// Check if Property exists in the database.
 	m := models.Property{}
-	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
-	if result.Error != nil {
+	result := appCtx.DBCheckIfPropertyIDExists(propertyID, &m)
+	if !result {
 		c.JSON(http.StatusNotFound, &gin.H{
 			"message": &errormessages.PropertyNotFound,
 		})
@@ -217,9 +217,9 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	if isManagementCompanyIDHashProvided {
 		m.ManagementCompanyIDHash = property.ManagementCompany.ID
 	}
-	result = appCtx.DB.Updates(&m)
-	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to update Property in database: %+v\n", result.Error))
+	resultUpdate := appCtx.DB.Updates(&m)
+	if resultUpdate.Error != nil {
+		panic(fmt.Sprintf("Failed to update Property in database: %+v\n", resultUpdate.Error))
 	}
 	// If the Management Company ID is not provided, remove it from the Property
 	// in the database.
@@ -243,6 +243,13 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	}
 
 	c.Data(http.StatusOK, "application/json", body)
+}
+
+// Checks if a given Property ID exists.
+func (appCtx *AppContext) DBCheckIfPropertyIDExists(propertyID string, m *models.Property) bool {
+	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
+
+	return result.Error == nil
 }
 
 // Gets a Property and Serializes it.

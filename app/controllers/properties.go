@@ -21,10 +21,6 @@ func generatePropertyIDHash() string {
 	return fmt.Sprintf("property_%s", id)
 }
 
-// Gets all Properties.
-func (appCtx *AppContext) GetProperties(c *gin.Context) {
-}
-
 // Creates a Property.
 func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	property := serializers.Property{}
@@ -100,6 +96,21 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 
 	c.Header("Location", fmt.Sprintf("/api/property/%s", idHash))
 	c.JSON(http.StatusNoContent, nil)
+}
+
+// Gets all Properties.
+func (appCtx *AppContext) GetProperties(c *gin.Context) {
+	results, err := appCtx.DBGetPropertiesSerialized()
+	if err != nil {
+		panic(fmt.Sprintf("Failed to serialize Properties from database: %+v\n", err))
+	}
+
+	body, err := json.Marshal(&results)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal Properties model to JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
 }
 
 // Updates a Property.

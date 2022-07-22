@@ -50,8 +50,8 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	// If a Management Company ID was provided, check if it exists in the table.
 	company := models.ManagementCompany{}
 	if property.ManagementCompany != nil && property.ManagementCompany.ID != nil {
-		result := appCtx.DB.Where("id_hash = ?", property.ManagementCompany.ID).First(&company)
-		if result.Error != nil {
+		result := appCtx.DBCheckIfManagementCompanyIDExists(*property.ManagementCompany.ID, &company)
+		if !result {
 			validationResults := validation.Property{
 				ManagementCompany: &validation.ManagementCompany{
 					ID: &errormessages.ManagementCompanyIDNotFound,
@@ -184,8 +184,8 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	// If a Management Company ID was provided, check if it exists in the table.
 	company := models.ManagementCompany{}
 	if isManagementCompanyIDHashProvided {
-		result := appCtx.DB.Where("id_hash = ?", property.ManagementCompany.ID).First(&company)
-		if result.Error != nil {
+		result := appCtx.DBCheckIfManagementCompanyIDExists(*property.ManagementCompany.ID, &company)
+		if !result {
 			validationResults := validation.Property{
 				ManagementCompany: &validation.ManagementCompany{
 					ID: &errormessages.ManagementCompanyIDNotFound,
@@ -248,6 +248,13 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 // Checks if a given Property ID exists.
 func (appCtx *AppContext) DBCheckIfPropertyIDExists(propertyID string, m *models.Property) bool {
 	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
+
+	return result.Error == nil
+}
+
+// Checks if a given Management Company ID exists.
+func (appCtx *AppContext) DBCheckIfManagementCompanyIDExists(managementCompanyID string, m *models.ManagementCompany) bool {
+	result := appCtx.DB.Where("id_hash = ?", managementCompanyID).First(&m)
 
 	return result.Error == nil
 }

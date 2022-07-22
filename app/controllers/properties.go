@@ -113,6 +113,35 @@ func (appCtx *AppContext) GetProperties(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", body)
 }
 
+// Gets a Property by ID.
+func (appCtx *AppContext) GetPropertyByID(c *gin.Context) {
+	propertyID := c.Param("propertyID")
+
+	// Check if Property exists in the database.
+	m := models.Property{}
+	result := appCtx.DB.Where("id_hash = ?", propertyID).First(&m)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, &gin.H{
+			"message": &errormessages.PropertyNotFound,
+		})
+		return
+	}
+
+	// Get Property by ID.
+	property, err := appCtx.DBGetPropertySerializedByID(propertyID)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get Property from database: %+v\n", err))
+	}
+
+	// Convert Property Model to JSON.
+	body, err := json.Marshal(property)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal Property model into JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
+}
+
 // Updates a Property.
 func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	propertyID := c.Param("propertyID")

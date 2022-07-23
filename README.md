@@ -33,7 +33,8 @@ The following `make` commands are available:
 - `make start` to start Docker services and initialize the database
   - `make start-services` to start Docker services
   - `make stop-services` to stop Docker services
-  - `make initialize-db` to initialize the database (create users, tables, etc)
+  - `make initialize-db` to initialize the database (create tables)
+  - `make populate-db` to load sample data into the database
 - `make destroy` to stop Docker services and deletes volumes
 - `make db-shell` to open a `bash` shell in the Postgres container
 - `make psql` to open `psql` in the Postgres container

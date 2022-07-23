@@ -10,7 +10,7 @@ POSTGRES_APP_CONNSTRING=postgresql://${POSTGRES_ADMIN_USERNAME}:${POSTGRES_ADMIN
 JWT_SIGNING_KEY=031a9c015be2438bbf9ffbb1e2911038
 
 # Starts services and initializes the database.
-start: stop-services start-services wait-5s initialize-db
+start: stop-services start-services wait-5s initialize-db populate-db
 
 # Starts Docker Compose services.
 start-services:
@@ -71,3 +71,13 @@ initialize-db:
 			psql ${POSTGRES_ADMIN_CONNSTRING} \
 				-f /tmp/initialize-db.sql
 	@echo "Done initialization database"
+
+# Populates the database with sample data.
+populate-db:
+	@echo "Loading sample data..."
+	@docker container cp ./.db/load-sample-data.sql ${POSTGRES_DOCKER_CONTAINER_NAME}:/tmp
+	@docker container exec \
+		-t ${POSTGRES_DOCKER_CONTAINER_NAME} \
+			psql ${POSTGRES_ADMIN_CONNSTRING} \
+				-f /tmp/load-sample-data.sql
+	@echo "Done loading sample data"

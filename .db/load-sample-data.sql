@@ -1,6 +1,7 @@
 -- Empty tables.
 TRUNCATE TABLE users CASCADE;
 TRUNCATE TABLE management_companies CASCADE;
+TRUNCATE TABLE properties CASCADE;
 
 -- Create users.
 INSERT INTO users(
@@ -256,4 +257,56 @@ VALUES (
 	'H2H18A',
 	'Canada',
 	'https://www.example.org/challenger-property-management'
+);
+
+-- Create Properties.
+INSERT INTO properties(
+	id_hash,
+	management_company_id_hash,
+	address_line1,
+	address_line2,
+	address_city,
+	address_state,
+	address_postal_code,
+	address_country,
+	property_type,
+	building_type,
+	neighborhood
+)
+VALUES (
+	'property_a8f58132165b4d11b06dd19050294f0e',
+	'management_df1c0b41427a48e89ecd9e7afce5d00d',
+	'50000 Yonge Street',
+	NULL,
+	'Toronto',
+	'ON',
+	'I8H7D2',
+	'Canada',
+	'residential',
+	'apartment',
+	'Willowdale North'	
+),(
+	'property_15284db05752437a925bfbef0f7e0235',
+	NULL,
+	'287261 Yonge Street',
+	NULL,
+	'Toronto',
+	'ON',
+	'M173I1',
+	'Canada',
+	'residential',
+	'apartment',
+	'Willowdale North'	
+),(
+	'property_77c6433c3ebc40ad8e63f313719da2da',
+	'management_5a3fccb945444c068dfe4772baa2a74c',
+	'181218236 Yonge Street',
+	'Unit 1622',
+	'Toronto',
+	'ON',
+	'I8G1R1',
+	'Canada',
+	'residential',
+	'detached',
+	'Willowdale Norther North'	
 );

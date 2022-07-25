@@ -1,3 +1,12 @@
+-- Sets the timestamp.
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 /* Create Users table */
 CREATE TABLE IF NOT EXISTS users (
 	id						SERIAL
@@ -14,8 +23,24 @@ CREATE TABLE IF NOT EXISTS users (
 								UNIQUE,
 
 	password			TEXT
+								NOT NULL,
+
+	created_at		TIMESTAMP
 								NOT NULL
+								DEFAULT NOW(),
+
+	updated_at		TIMESTAMP
+								NOT NULL
+								DEFAULT NOW()							
 );
+
+-- Update updated_at when User is updated.
+CREATE TRIGGER
+	update_user_timestamp_on_update
+BEFORE UPDATE ON
+	users
+FOR EACH ROW
+	EXECUTE PROCEDURE trigger_set_timestamp();
 
 /* Create Management Companies table */
 CREATE TABLE IF NOT EXISTS management_companies (

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type User struct {
 	ID int `gorm:"primaryKey"`
 
@@ -11,4 +13,10 @@ type User struct {
 
 	// Hashed password.
 	Password *string `gorm:"column:password"`
+
+	// User creation time.
+	CreatedAt time.Time `gorm:"column:created_at"`
+
+	// User update time.
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }

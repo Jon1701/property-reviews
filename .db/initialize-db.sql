@@ -128,10 +128,26 @@ CREATE TABLE IF NOT EXISTS properties (
 
 	neighborhood				VARCHAR(255),
 
+	created_at					TIMESTAMP
+											NOT NULL
+											DEFAULT NOW(),
+
+	updated_at					TIMESTAMP
+											NOT NULL
+											DEFAULT NOW(),
+
 	CONSTRAINT fk_management_company
 		FOREIGN KEY(management_company_id_hash)
 			REFERENCES management_companies(id_hash)	
 );
+
+-- Update updated_at when Property is updated.
+CREATE TRIGGER
+	update_property_timestamp_on_update
+BEFORE UPDATE ON
+	properties
+FOR EACH ROW
+	EXECUTE PROCEDURE trigger_set_timestamp();
 
 /* Create Reviews table. */
 CREATE TABLE IF NOT EXISTS reviews (

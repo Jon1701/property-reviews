@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Property struct {
 	ID int `gorm:"primaryKey"`
 
@@ -35,6 +37,12 @@ type Property struct {
 
 	// ID Hash of the Management Company.
 	ManagementCompanyIDHash *string `gorm:"column:management_company_id_hash"`
+
+	// Creation Time.
+	CreatedAt time.Time `gorm:"column:created_at"`
+
+	// Update Time.
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 type PropertyWithManageCompany struct {

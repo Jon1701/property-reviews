@@ -42,7 +42,7 @@ BEFORE UPDATE ON
 FOR EACH ROW
 	EXECUTE PROCEDURE trigger_set_timestamp();
 
-/* Create Management Companies table */
+-- Create Management Companies table.
 CREATE TABLE IF NOT EXISTS management_companies (
 	id									SERIAL
 											PRIMARY KEY
@@ -72,8 +72,24 @@ CREATE TABLE IF NOT EXISTS management_companies (
 	address_country			VARCHAR(100)
 											NOT NULL,
 	
-	website							VARCHAR(255)
+	website							VARCHAR(255),
+
+	created_at					TIMESTAMP
+											NOT NULL
+											DEFAULT NOW(),
+
+	updated_at					TIMESTAMP
+											NOT NULL
+											DEFAULT NOW()			
 );
+
+-- Update updated_at when Management Company is updated.
+CREATE TRIGGER
+	update_management_company_timestamp_on_update
+BEFORE UPDATE ON
+	management_companies
+FOR EACH ROW
+	EXECUTE PROCEDURE trigger_set_timestamp();
 
 /* Create Properties table */
 CREATE TABLE IF NOT EXISTS properties (

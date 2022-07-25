@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type ManagementCompany struct {
 	ID int `gorm:"primaryKey"`
 
@@ -29,4 +31,10 @@ type ManagementCompany struct {
 
 	// Website.
 	Website *string `gorm:"column:website"`
+
+	// Creation Time.
+	CreatedAt time.Time `gorm:"column:created_at"`
+
+	// Update Time.
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }

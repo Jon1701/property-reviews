@@ -83,6 +83,12 @@ CREATE TABLE IF NOT EXISTS management_companies (
 											DEFAULT NOW()			
 );
 
+-- Create index for the id_hash column in the Management Companies table. 
+CREATE INDEX IF NOT EXISTS
+	index_management_companies_id_hash
+ON
+	management_companies(id_hash);
+
 -- Update updated_at when Management Company is updated.
 CREATE TRIGGER
 	update_management_company_timestamp_on_update

@@ -265,13 +265,6 @@ func (appCtx *AppContext) DBCheckIfPropertyIDExists(propertyID string, m *models
 	return result.Error == nil
 }
 
-// Checks if a given Management Company ID exists.
-func (appCtx *AppContext) DBCheckIfManagementCompanyIDExists(managementCompanyID string, m *models.ManagementCompany) bool {
-	result := appCtx.DB.Where("id_hash = ?", managementCompanyID).First(&m)
-
-	return result.Error == nil
-}
-
 // Gets a Property and Serializes it.
 func (appCtx *AppContext) DBGetPropertySerializedByID(propertyID string) (*serializers.Property, error) {
 	// Get the updated Property from the database.

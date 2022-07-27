@@ -12,6 +12,7 @@ import (
 	"github.com/Jon1701/property-reviews/app/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // Generates a hyphenless UUID with "management_" prepended.
@@ -71,6 +72,27 @@ func (appCtx *AppContext) CreateManagementCompany(c *gin.Context) {
 
 	c.Header("Location", fmt.Sprintf("/api/management/%s", *m.IDHash))
 	c.JSON(http.StatusNoContent, nil)
+}
+
+// Gets a list of Management Companies.
+func (appCtx *AppContext) GetManagementCompanies(c *gin.Context) {
+	// Get pagination parameters.
+	params := PaginationParameters{}
+	SerializePaginationParameters(c, &params)
+
+	// Get paginated Management Company results.
+	results, err := appCtx.DBGetManagementCompanies(params.AfterID, params.BeforeID, params.Limit)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get Management Companies: %+v\n", err))
+	}
+
+	// Serialize results into JSON.
+	body, err := json.Marshal(results)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to serialize Management Company results into JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
 }
 
 // Updates a Management Company.
@@ -151,4 +173,72 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	}
 
 	c.Data(http.StatusOK, "application/json", body)
+}
+
+// Gets an array of Management Companies.
+func (appCtx *AppContext) DBGetManagementCompanies(afterID *string, beforeID *string, paramLimit *uint64) (*[]serializers.ManagementCompany, error) {
+	var limit uint64 = uint64(20)
+	if *paramLimit > 0 {
+		limit = *paramLimit
+	}
+
+	// Get Management Companies from the database.
+	var result *gorm.DB
+	m := []models.ManagementCompany{}
+	if afterID != nil && beforeID != nil { // Between.
+		result = appCtx.DB.Raw(fmt.Sprintf(`
+			SELECT * FROM	management_companies
+			WHERE id BETWEEN
+				(SELECT id	FROM management_companies WHERE id_hash = '%s')
+					AND
+				(SELECT id	FROM management_companies WHERE id_hash = '%s')
+			LIMIT %d;
+	`, *afterID, *beforeID, limit)).Scan(&m)
+	} else if afterID != nil && beforeID == nil { // After.
+		result = appCtx.DB.Raw(fmt.Sprintf(`
+			SELECT * FROM	management_companies
+			WHERE id > (SELECT id FROM management_companies WHERE id_hash = '%s')
+			LIMIT %d;
+		`, *afterID, limit)).Scan(&m)
+	} else if afterID == nil && beforeID != nil { // Before.
+		result = appCtx.DB.Raw(fmt.Sprintf(`
+			SELECT * FROM	management_companies
+			WHERE id < (SELECT id FROM management_companies WHERE id_hash = '%s')
+			LIMIT %d;
+		`, *beforeID, limit)).Scan(&m)
+	} else {
+		result = appCtx.DB.Raw(fmt.Sprintf(`
+			SELECT * FROM management_companies
+			LIMIT %d
+		`, limit)).Scan(&m)
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Serialize results.
+	companiesSerialized := []serializers.ManagementCompany{}
+	for _, item := range m {
+		property := appCtx.DBSerializeManagementCompanyModel(item)
+		companiesSerialized = append(companiesSerialized, *property)
+	}
+
+	return &companiesSerialized, nil
+}
+
+// Serializes a Management Company Model into its Serializer.
+func (appCtx *AppContext) DBSerializeManagementCompanyModel(m models.ManagementCompany) *serializers.ManagementCompany {
+	return &serializers.ManagementCompany{
+		ID:   m.IDHash,
+		Name: m.Name,
+		Address: &serializers.Address{
+			Line1:      m.AddressLine1,
+			Line2:      m.AddressLine2,
+			City:       m.AddressCity,
+			State:      m.AddressState,
+			PostalCode: m.AddressPostalCode,
+			Country:    m.AddressCountry,
+		},
+		Website: m.Website,
+	}
 }

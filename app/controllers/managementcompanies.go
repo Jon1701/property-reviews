@@ -97,19 +97,23 @@ func (appCtx *AppContext) GetManagementCompanies(c *gin.Context) {
 
 // Updates a Management Company.
 func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
-	company := serializers.ManagementCompany{}
-
-	// Check if Management Company exists.
 	managementID := c.Param("managementID")
-	m := models.ManagementCompany{IDHash: &managementID}
-	result := appCtx.DB.Where("id_hash = ?", managementID).First(&m)
-	if result.Error != nil {
-		c.JSON(http.StatusNotFound, &gin.H{"message": "Management Company not found"})
+
+	// Get Management Company by ID.
+	m, err := appCtx.DBGetManagementCompanyByID(managementID)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get Management Company by ID: %+v\n", err))
+	}
+
+	// Check if a Management Company was found.
+	if m.IDHash == nil {
+		c.JSON(http.StatusNotFound, &gin.H{"message": errormessages.ManagementCompanyIDNotFound})
 		return
 	}
 
 	// Serialize the request body, respond with Bad Request if unable to.
-	err := SerializeRequestBody(c, &company)
+	company := serializers.ManagementCompany{}
+	err = SerializeRequestBody(c, &m)
 	if err != nil {
 		msg := errormessages.FailedToParseRequestBody
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -147,14 +151,13 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	}
 
 	// Get updated row.
-	m = models.ManagementCompany{}
-	result = appCtx.DB.Where("id_hash = ?", managementID).First(&m)
-	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to get Management Company from database: %+v\n", result.Error))
+	row, err := appCtx.DBGetManagementCompanyByID(managementID)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get Management Company from the database: %+v\n", err))
 	}
 
 	// Serialize row into JSON.
-	company = *appCtx.DBSerializeManagementCompanyModel(m)
+	company = *appCtx.DBSerializeManagementCompanyModel(*row)
 	body, err := json.Marshal(company)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))

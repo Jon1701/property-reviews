@@ -126,7 +126,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 			panic(fmt.Sprintf("Failed to marshal the field validation results struct into JSON: %+v\n", err))
 		}
 
-		c.Data(http.StatusBadRequest, "application/json", []byte(body))
+		c.Data(http.StatusBadRequest, "application/json", body)
 		return
 	}
 

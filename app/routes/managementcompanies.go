@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/Jon1701/property-reviews/app/controllers"
+	"github.com/Jon1701/property-reviews/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,4 +10,5 @@ import (
 func RegisterManagementCompaniesRoutes(appCtx *controllers.AppContext, rg *gin.RouterGroup) {
 	rg.POST("/", appCtx.CreateManagementCompany)
 	rg.PATCH("/:managementID", appCtx.UpdateManagementCompany)
+	rg.GET("/", middleware.SanitizePaginationParameters(), appCtx.GetManagementCompanies)
 }

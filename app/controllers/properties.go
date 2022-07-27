@@ -189,10 +189,16 @@ func (appCtx *AppContext) UpdateProperty(c *gin.Context) {
 	isManagementCompanyIDHashProvided := property.ManagementCompany != nil && property.ManagementCompany.ID != nil && len(*property.ManagementCompany.ID) > 0
 
 	// If a Management Company ID was provided, check if it exists in the table.
-	company := models.ManagementCompany{}
 	if isManagementCompanyIDHashProvided {
-		result := appCtx.DBCheckIfManagementCompanyIDExists(*property.ManagementCompany.ID, &company)
-		if !result {
+		// Get Management Company by ID.
+		company, err := appCtx.DBGetManagementCompanyByID(*property.ManagementCompany.ID)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to get Management Company from the database: %+v\n", err))
+		}
+
+		// If the Management Company could not be found, generate a validation
+		// message and respond to the client.
+		if company.IDHash == nil {
 			validationResults := validation.Property{
 				ManagementCompany: &validation.ManagementCompany{
 					ID: &errormessages.ManagementCompanyIDNotFound,

@@ -48,10 +48,17 @@ func (appCtx *AppContext) CreateProperty(c *gin.Context) {
 	}
 
 	// If a Management Company ID was provided, check if it exists in the table.
-	company := models.ManagementCompany{}
+	var company *models.ManagementCompany
 	if property.ManagementCompany != nil && property.ManagementCompany.ID != nil {
-		result := appCtx.DBCheckIfManagementCompanyIDExists(*property.ManagementCompany.ID, &company)
-		if !result {
+		// Get Management Company.
+		company, err = appCtx.DBGetManagementCompanyByID(*property.ManagementCompany.ID)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to get Management Company from the database: %+v\n", err))
+		}
+
+		// If Management Company does not exist, generate a validation message,
+		// and respond to client.
+		if company.IDHash == nil {
 			validationResults := validation.Property{
 				ManagementCompany: &validation.ManagementCompany{
 					ID: &errormessages.ManagementCompanyIDNotFound,

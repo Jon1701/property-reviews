@@ -95,6 +95,34 @@ func (appCtx *AppContext) GetManagementCompanies(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", body)
 }
 
+// Gets a Management Company by ID.
+func (appCtx *AppContext) GetManagementCompanyByID(c *gin.Context) {
+	managementID := c.Param("managementID")
+
+	// Get Management Company by ID.
+	row, err := appCtx.DBGetManagementCompanyByID(managementID)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get Management Company by ID: %+v\n", err))
+	}
+
+	// Check if a Management Company was found.
+	if row.IDHash == nil {
+		c.JSON(http.StatusNotFound, &gin.H{
+			"message": errormessages.ManagementCompanyIDNotFound,
+		})
+		return
+	}
+
+	// Serialize row into JSON.
+	s := *appCtx.DBSerializeManagementCompanyModel(*row)
+	body, err := json.Marshal(s)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))
+	}
+
+	c.Data(http.StatusOK, "application/json", body)
+}
+
 // Updates a Management Company.
 func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	managementID := c.Param("managementID")

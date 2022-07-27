@@ -241,6 +241,24 @@ func (appCtx *AppContext) DBGetManagementCompanies(afterID *string, beforeID *st
 	return &companiesSerialized, nil
 }
 
+// Updates a Management Company in the database.
+func (appCtx *AppContext) DBUpdateManagementCompany(managementID string, s *serializers.ManagementCompany) error {
+	m := models.ManagementCompany{
+		Name:    s.Name,
+		Website: s.Website,
+	}
+	if s.Address != nil {
+		m.AddressLine1 = s.Address.Line1
+		m.AddressLine2 = s.Address.Line2
+		m.AddressCity = s.Address.City
+		m.AddressState = s.Address.State
+		m.AddressPostalCode = s.Address.PostalCode
+		m.AddressCountry = s.Address.Country
+	}
+	result := appCtx.DB.Model(&models.ManagementCompany{}).Where("id_hash = ?", managementID).Updates(&m)
+	return result.Error
+}
+
 // Serializes a Management Company Model into its Serializer.
 func (appCtx *AppContext) DBSerializeManagementCompanyModel(m models.ManagementCompany) *serializers.ManagementCompany {
 	return &serializers.ManagementCompany{

@@ -175,6 +175,21 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", body)
 }
 
+// Gets a Management Company from the database.
+func (appCtx *AppContext) DBGetManagementCompanyByID(managementID string) (*models.ManagementCompany, error) {
+	m := models.ManagementCompany{}
+	result := appCtx.DB.Raw(fmt.Sprintf(`
+		SELECT *
+		FROM management_companies
+		WHERE id_hash = '%s';
+	`, managementID)).Scan(&m)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &m, nil
+}
+
 // Gets an array of Management Companies.
 func (appCtx *AppContext) DBGetManagementCompanies(afterID *string, beforeID *string, paramLimit *uint64) (*[]serializers.ManagementCompany, error) {
 	var limit uint64 = uint64(20)

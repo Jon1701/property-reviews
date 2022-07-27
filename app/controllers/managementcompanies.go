@@ -154,19 +154,7 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 	}
 
 	// Serialize row into JSON.
-	company = serializers.ManagementCompany{
-		ID:   m.IDHash,
-		Name: m.Name,
-		Address: &serializers.Address{
-			Line1:      m.AddressLine1,
-			Line2:      m.AddressLine2,
-			City:       m.AddressCity,
-			State:      m.AddressState,
-			PostalCode: m.AddressPostalCode,
-			Country:    m.AddressCountry,
-		},
-		Website: m.Website,
-	}
+	company = *appCtx.DBSerializeManagementCompanyModel(m)
 	body, err := json.Marshal(company)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to marshal the database row struct into JSON: %+v\n", err))

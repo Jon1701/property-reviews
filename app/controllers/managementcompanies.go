@@ -134,20 +134,10 @@ func (appCtx *AppContext) UpdateManagementCompany(c *gin.Context) {
 		return
 	}
 
-	// Persist into database.
-	m.Name = company.Name
-	if company.Address != nil {
-		m.AddressLine1 = company.Address.Line1
-		m.AddressLine2 = company.Address.Line2
-		m.AddressCity = company.Address.City
-		m.AddressState = company.Address.State
-		m.AddressPostalCode = company.Address.PostalCode
-		m.AddressCountry = company.Address.Country
-	}
-	m.Website = company.Website
-	result = appCtx.DB.Updates(&m)
-	if result.Error != nil {
-		panic(fmt.Sprintf("Failed to persist Management Company in database: %+v\n", result.Error))
+	// Persist changes.
+	err = appCtx.DBUpdateManagementCompany(managementID, &company)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to update Management Company in the database: %+v\n", err))
 	}
 
 	// Get updated row.

@@ -29,7 +29,7 @@ func IsURLOfCorrectLength(url string) bool {
 }
 
 // Validates Address struct values.
-func ValidateAddress(address *serializers.Address, line2Required bool) *Address {
+func ValidateAddress(address *serializers.Address, line2Required bool, buildingType *serializers.BuildingType) *Address {
 	results := Address{}
 	passValidation := true
 
@@ -75,6 +75,13 @@ func ValidateAddress(address *serializers.Address, line2Required bool) *Address 
 	isLine2ValidLength := address.Line2 != nil && len(*address.Line1) >= errormessages.AddressLine1MinLength && len(*address.Line1) <= errormessages.AddressLine1MaxLength
 	if address.Line2 != nil && !isLine2ValidLength {
 		results.Line2 = &errormessages.AddressLine2InvalidLength
+		passValidation = false
+	}
+
+	// If Line 2 is provided, and the Building Type is an Apartment or Condominium,
+	// do not allow a value for Line 2.
+	if address.Line2 != nil && (*buildingType == serializers.TypesOfBuildings["Apartment"] || *buildingType == serializers.TypesOfBuildings["Condominium"]) {
+		results.Line2 = &errormessages.FieldValueNotAllowedForCurrentBuildingType
 		passValidation = false
 	}
 
@@ -142,7 +149,7 @@ func ValidateAddress(address *serializers.Address, line2Required bool) *Address 
 }
 
 // Validates Address struct values, but ignore nil values.
-func ValidateAddressIgnoreNil(address *serializers.Address) *Address {
+func ValidateAddressIgnoreNil(address *serializers.Address, buildingType *serializers.BuildingType) *Address {
 	results := Address{}
 	passValidation := true
 
@@ -160,6 +167,13 @@ func ValidateAddressIgnoreNil(address *serializers.Address) *Address {
 		isValidLength := len(*address.Line2) >= errormessages.AddressLine2MinLength && len(*address.Line2) <= errormessages.AddressLine2MaxLength
 		if !isValidLength {
 			results.Line2 = &errormessages.AddressLine2InvalidLength
+		}
+
+		// If Line 2 is provided, and the Building Type is an Apartment or Condominium,
+		// do not allow a value for Line 2.
+		if *buildingType == serializers.TypesOfBuildings["Apartment"] || *buildingType == serializers.TypesOfBuildings["Condominium"] {
+			results.Line2 = &errormessages.FieldValueNotAllowedForCurrentBuildingType
+			passValidation = false
 		}
 	}
 

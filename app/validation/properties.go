@@ -20,7 +20,7 @@ func ValidateCreateProperty(property serializers.Property) *Property {
 	passValidation := true
 
 	// Check Address validity.
-	resultsAddress := ValidateAddress(property.Address, false)
+	resultsAddress := ValidateAddress(property.Address, false, property.BuildingType)
 	if resultsAddress != nil {
 		results.Address = resultsAddress
 		passValidation = false
@@ -83,7 +83,7 @@ func ValidateUpdateProperty(property serializers.Property) *Property {
 
 	// Check Address validity.
 	if property.Address != nil {
-		resultsAddress := ValidateAddressIgnoreNil(property.Address)
+		resultsAddress := ValidateAddressIgnoreNil(property.Address, property.BuildingType)
 		if resultsAddress != nil {
 			results.Address = resultsAddress
 			passValidation = false

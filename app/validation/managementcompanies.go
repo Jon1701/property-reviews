@@ -32,7 +32,7 @@ func ValidateCreateManagementCompany(company serializers.ManagementCompany) *Man
 	}
 
 	// Check Address validity.
-	resultsAddress := ValidateAddress(company.Address, false)
+	resultsAddress := ValidateAddress(company.Address, false, nil)
 	if resultsAddress != nil {
 		results.Address = resultsAddress
 		passValidation = false
@@ -75,7 +75,7 @@ func ValidateUpdateManagementCompany(company serializers.ManagementCompany) *Man
 
 	// Check Address length.
 	if company.Address != nil {
-		resultsAddress := ValidateAddressIgnoreNil(company.Address)
+		resultsAddress := ValidateAddressIgnoreNil(company.Address, nil)
 		if resultsAddress != nil {
 			results.Address = resultsAddress
 			passValidation = false

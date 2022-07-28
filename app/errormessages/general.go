@@ -34,6 +34,7 @@ var AddressPostalCodeInvalidLength ErrorMessage = FieldMustBeBetweenXandYCharact
 var AddressCountryInvalidLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(AddressCountryMinLength, AddressCountryMaxLength)
 var WebsiteInvalidLength ErrorMessage = FieldMustBeBetweenXandYCharactersInLength(WebsiteMinLength, WebsiteMaxLength)
 var InvalidURL ErrorMessage = "invalid URL"
+var FieldValueNotAllowed ErrorMessage = "field value not allowed"
 
 // Generates an error message indicating that a field must be between a certain
 // length of characters.

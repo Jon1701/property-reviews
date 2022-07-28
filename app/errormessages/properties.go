@@ -25,6 +25,7 @@ var PropertyNeighborhoodInvalidFieldLength ErrorMessage = FieldMustBeBetweenXand
 var PropertyInvalidPropertyType ErrorMessage
 var PropertyInvalidBuildingType ErrorMessage
 var PropertyNotFound ErrorMessage = "property not found"
+var FieldValueNotAllowedForCurrentBuildingType ErrorMessage = "field value not allowed for current building type"
 
 func init() {
 	// Build arrays of Building/Property Types.
